@@ -10,9 +10,13 @@ await client.queryArray(
   `CREATE TABLE tournaments (
         id SERIAL PRIMARY KEY,
         lobby_code TEXT NOT NULL,
-        created_at timestamp with time zone NOT NULL,
+        number_of_rounds INTEGER NOT NULL,
+        time_limit INTEGER NOT NULL,
+        add_bots BOOLEAN,
+        tournament_type TEXT NOT NULL,
         open BOOLEAN,
-        players INTEGER NOT NULL
+        players INTEGER NOT NULL,
+        created_at timestamp with time zone NOT NULL,
     )`
 );
 
@@ -22,6 +26,7 @@ await client.queryArray(
         name TEXT NOT NULL,
         tournament_id INTEGER NOT NULL,
         host BOOLEAN,
+        choice TEXT NOT NULL,
         created_at timestamp with time zone NOT NULL,
         FOREIGN KEY(tournament_id) REFERENCES tournaments(id)
     )`
