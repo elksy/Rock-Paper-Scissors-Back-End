@@ -7,7 +7,7 @@ const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
 config({ path: `./.env.${DENO_ENV}`, export: true });
 
 const app = new Application();
-const PORT = Deno.env.get("PORT");
+const PORT = parseInt(Deno.env.get("PORT"));
 
 const corsInputs = {
   methods: "POST, GET",
