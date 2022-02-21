@@ -19,8 +19,8 @@ const corsInputs = {
     "User-Agent",
   ],
   credentials: true,
+  origin: /^.+localhost:(3000)$/,
 };
 
 app.use(abcCors(corsInputs));
-app.get("/", async () => {});
 app.start({ port: PORT });
