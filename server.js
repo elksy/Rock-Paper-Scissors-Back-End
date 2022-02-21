@@ -10,7 +10,7 @@ const app = new Application();
 const PORT = parseInt(Deno.env.get("PORT"));
 
 const corsInputs = {
-  methods: "POST, GET",
+  methods: "GET",
   allowedHeaders: [
     "Authorization",
     "Content-Type",
@@ -22,4 +22,5 @@ const corsInputs = {
 };
 
 app.use(abcCors(corsInputs));
+app.get("/", async () => {});
 app.start({ port: PORT });
