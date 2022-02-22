@@ -28,7 +28,7 @@ let sockets = new Map();
 
 app.use(abcCors("*"));
 // app.get("/session", (server) => getSession(server));
-app.get("/ws", (server) => handleWebSocket(server, sockets));
+app.get("/wslobby", (server) => handleWebSocket(server, sockets));
 app.start({ port: 8080 });
 
 console.log(`server listening on http://localhost:8080`);
