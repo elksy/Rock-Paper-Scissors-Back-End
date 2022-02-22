@@ -18,9 +18,11 @@ const CorsConfig = {
 
 const app = new Application();
 
+let sockets = new Map();
+
 app.use(abcCors(CorsConfig));
 app.get("/session", (server) => getSession(server));
-app.get("/ws", (server) => handleWebSocket(server));
+app.get("/ws", (server) => handleWebSocket(server, sockets));
 app.start({ port: PORT });
 
 console.log(`server listening on http://localhost:8080`);
@@ -28,3 +30,5 @@ console.log(`server listening on http://localhost:8080`);
 function getSession(server) {
 	console.log("session");
 }
+
+sockets.delete(uuid);
