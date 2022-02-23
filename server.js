@@ -3,6 +3,7 @@ import { abcCors } from "https://deno.land/x/cors/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 import handleWebSocket from "./server-websocket.js";
 import handleTournamentWS from "./serverTournamentWs.js";
+import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
 // Fetches the environment variables to set up the correct PORT
 // const DENO_ENV = (await Deno.env.get("DENO_ENV")) ?? "development";
@@ -40,6 +41,15 @@ let tournaments = new Map();
 // tournamnetID: [tournament bracket data]
 // }
 
+let tournamentInfo = new Map();
+//  { tournamentId : {
+//       rounds: rounds,
+//       timeLimit: timeLimit,
+//       addBots: addBots,
+//       type: type,
+//     }
+// }
+
 let userData = new Map();
 // {
 //   tournamentID: {
@@ -56,7 +66,25 @@ app.get("/wslobby", (server) => handleWebSocket(server, sockets));
 app.get("/wsTournament", (server) =>
   handleTournamentWS(server, sockets, tournaments)
 );
-
+app.post("/createTournament", (server) => createTournament(server));
 app.start({ port: 8080 });
 
 console.log(`server listening on http://localhost:8080`);
+
+async function createTournament(server) {
+  try {
+    const { rounds, timeLimit, addBots, type } = await server.body;
+    const tournamentId = v4.generate();
+    const tournamentData = {
+      rounds: rounds,
+      timeLimit: timeLimit,
+      addBots: addBots,
+      type: type,
+    };
+    tournamentInfo.set(tournamentId, tournamentData);
+    return server.json({ tournamentId: tournamentId }, 200);
+  } catch (error) {
+    console.log(error);
+    return server.json({}, 500);
+  }
+}
