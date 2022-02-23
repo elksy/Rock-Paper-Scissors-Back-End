@@ -49,7 +49,6 @@ function sendPlayerInfo(sockets) {
 }
 
 function receivedPlayerName(event, sockets, uuid) {
-  console.log("getNames");
   if ("name" in event) {
     const uuidData = sockets.get(uuid);
     uuidData["playerName"] = event.name;
