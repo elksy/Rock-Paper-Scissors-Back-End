@@ -4,7 +4,6 @@ import {
 	isWebSocketCloseEvent,
 } from "https://deno.land/std@0.99.0/ws/mod.ts";
 
-//get user choice
 //send opp choice
 
 const handleGamepageWs = async (games, server, sockets, tournaments) => {
@@ -25,25 +24,30 @@ async function handleEvent(games, ws, sockets, tournaments, uuid, tournamentID) 
 
 	for await (const e of ws) {
 		if (isWebSocketCloseEvent(e)) {
-			//checks to see if browser closed
-			sockets.delete(uuid); //removed key-value pair from map
+			sockets.delete(uuid);
 			sendPlayerInfo(sockets);
 		} else {
 			const event = JSON.parse(e);
-			handlePlayerMove(games, event, sockets, uuid, tournaments, tournamentID);
+			handlePlayerMove(games, event, uuid, tournaments, tournamentID);
 		}
 	}
 }
 
-function handlePlayerMove(event, sockets, uuid, tournaments, tournamentID) {
-	const opponentId = getOpponentId(event, uuid, tournament, tournamentID);
-	games.get(opponentId).send();
+function handlePlayerMove(event, uuid, tournaments, tournamentID) {
+	if ("option" in event) {
+		const opponentId = getOpponentId(event, uuid, tournaments, tournamentID);
+		games.get(opponentId).send(event.option);
+	}
 }
 
 function addUserSocket(ws, sockets, uuid, tournamentID) {
 	const tournamentSockets = sockets.get(tournamentID);
 	tournamentSockets[uuid] = ws;
 	sockets.set(tournamentID, tournamentSockets);
+}
+
+function getOpponentId(event, uuid, tournaments, tournamentID) {
+	//use uuid to find opp in same tournament bracket
 }
 
 export default handleWebSocket;
