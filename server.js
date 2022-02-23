@@ -11,16 +11,10 @@ import handleTournamentWS from "./serverTournamentWs.js";
 
 // We need to set up a strict cors policy that works for http and websockets
 const CorsConfig = {
-  methods: "GET",
-  origin: "*",
-  allowedHeaders: [
-    "Authorization",
-    "Content-Type",
-    "Accept",
-    "Origin",
-    "User-Agent",
-  ],
-  credentials: true,
+	methods: "GET",
+	origin: "*",
+	allowedHeaders: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
+	credentials: true,
 };
 
 const app = new Application();
@@ -40,6 +34,13 @@ let tournaments = new Map();
 // tournamnetID: [tournament bracket data]
 // }
 
+let games = new Map();
+// {
+//     uuid: socket,
+//     uuid: socket,
+//     uuid: socket,
+//   }
+
 let userData = new Map();
 // {
 //   tournamentID: {
@@ -53,9 +54,8 @@ let userData = new Map();
 app.use(abcCors("*"));
 // app.get("/session", (server) => getSession(server));
 app.get("/wslobby", (server) => handleWebSocket(server, sockets));
-app.get("/wsTournament", (server) =>
-  handleTournamentWS(server, sockets, tournaments)
-);
+app.get("/wsgame", (server) => handleGamepageWs(games, server, sockets, tournaments));
+app.get("/wsTournament", (server) => handleTournamentWS(server, sockets, tournaments));
 
 app.start({ port: 8080 });
 
