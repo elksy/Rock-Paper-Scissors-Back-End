@@ -34,6 +34,20 @@ function generateRoundData(players, includeBots = false) {
     }
   }
 
+  function fillForMissingPlayers() {
+    while (players.length < numOfMatches) {
+      if (includeBots) {
+        players.push({
+          name: "Bot" + players.length,
+          bgColor: "Grey",
+          textColor: "White",
+        });
+      } else {
+        players.push(null);
+      }
+    }
+  }
+
   function shuffle(array, seed = Date.now()) {
     let currentIndex = array.length;
     let temporaryValue, randomIndex;
@@ -51,20 +65,6 @@ function generateRoundData(players, includeBots = false) {
       array[randomIndex] = temporaryValue;
     }
     return array;
-  }
-
-  function fillForMissingPlayers() {
-    while (players.length < numOfMatches) {
-      if (includeBots) {
-        players.push({
-          name: "Bot" + players.length,
-          bgColor: "Grey",
-          textColor: "White",
-        });
-      } else {
-        players.push(null);
-      }
-    }
   }
 
   function seedPlayers() {
@@ -90,21 +90,17 @@ function generateRoundData(players, includeBots = false) {
       }
     }
   }
-  function startTournament() {
-    createRounds();
-    players = shuffle(players);
-    fillForMissingPlayers();
-    seedPlayers();
-    resolveByes();
-  }
 
-  startTournament();
+  createRounds();
+  players = shuffle(players);
+  fillForMissingPlayers();
+  seedPlayers();
+  resolveByes();
 
   return rounds;
 }
 
 export default generateRoundData;
-
 // const players = [
 //   { name: "Team A", bgColor: "red", textColor: "black" },
 //   { name: "Team B", bgColor: "blue", textColor: "white" },
