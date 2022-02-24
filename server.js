@@ -1,7 +1,7 @@
 import { Application } from "https://deno.land/x/abc@v1.3.3/mod.ts";
 import { abcCors } from "https://deno.land/x/cors/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
-import handleWebSocket from "./server-websocket.js";
+import handleWebSocket from "./serverLobbyWs.js";
 import handleTournamentWS from "./serverTournamentWs.js";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
@@ -62,10 +62,11 @@ let userData = new Map();
 
 app.use(abcCors());
 // app.get("/session", (server) => getSession(server));
-app.get("/wslobby", (server) => handleWebSocket(server, sockets));
+app.get("/wslobby/:id", (server) => handleWebSocket(server, sockets, userData));
 app.get("/wsTournament", (server) =>
   handleTournamentWS(server, sockets, tournaments)
 );
+app.get("/getTournamentInfo/:id", (server) => getTournamentInfo(server));
 app.post("/createTournament", (server) => createTournament(server));
 app.start({ port: 8080 });
 
@@ -82,9 +83,23 @@ async function createTournament(server) {
       type: type,
     };
     tournamentInfo.set(tournamentId, tournamentData);
+    tournaments.set(tournamentId, {});
     return server.json({ tournamentId: tournamentId }, 200);
   } catch (error) {
     console.log(error);
     return server.json({}, 500);
+  }
+}
+
+async function getTournamentInfo(server) {
+  try {
+    const { id } = await server.params;
+    if (tournamentInfo.has(id)) {
+      const tournamentData = tournamentInfo.get(id);
+      tournamentData["id"] = id;
+      return server.json({ valid: true, data: tournamentData });
+    } else return server.json({ valid: false });
+  } catch (error) {
+    return server.json({ valid: false });
   }
 }
