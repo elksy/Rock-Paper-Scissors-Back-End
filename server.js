@@ -81,7 +81,13 @@ app.get("/wsgame", (server) =>
 app.get("/wsTournament", (server) =>
   handleTournamentWS(server, sockets, tournaments)
 );
+
 app.get("/getTournamentInfo/:id", (server) => getTournamentInfo(server));
+
+
+app.post("/sessions", (server) => createSession(server));
+
+
 app.post("/createTournament", (server) => createTournament(server));
 
 app.start({ port: PORT });
@@ -110,6 +116,7 @@ async function createTournament(server) {
   }
 }
 
+
 async function getTournamentInfo(server) {
   try {
     const { id } = await server.params;
@@ -121,4 +128,34 @@ async function getTournamentInfo(server) {
   } catch (error) {
     return server.json({ valid: false });
   }
+
+async function createSession(server) {
+  const sessionId = v4.generate();
+
+  const userData = {
+    playerName: playerName,
+    playerColour: playerColour,
+    tournamentId: tournamentId,
+  };
+  sessionInfo.set(sessionId, sessionData);
+  const expiryDate = newDate(newDate().getTime() + 7 * 24 * 60 * 60 * 1000);
+  await server.setCookie({
+    name: "sessionId",
+    value: sessionId,
+    expires: expiryDate,
+    path: "/",
+  });
+  await server.setCookie({
+    name: "playerColour",
+    value: playerColour,
+    expires: expiryDate,
+    path: "/",
+  });
+  await server.setCookie({
+    name: "tournament_id",
+    value: tournament_id,
+    expires: expiryDate,
+    path: "/",
+  });
+
 }
