@@ -12,10 +12,16 @@ import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
 // We need to set up a strict cors policy that works for http and websockets
 const CorsConfig = {
-	methods: "GET",
-	origin: "*",
-	allowedHeaders: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
-	credentials: true,
+  methods: "GET",
+  origin: "*",
+  allowedHeaders: [
+    "Authorization",
+    "Content-Type",
+    "Accept",
+    "Origin",
+    "User-Agent",
+  ],
+  credentials: true,
 };
 
 const app = new Application();
@@ -35,7 +41,6 @@ let tournaments = new Map();
 // tournamnetID: [tournament bracket data]
 // }
 
-
 let games = new Map();
 // {
 //     uuid: socket,
@@ -52,7 +57,6 @@ let tournamentInfo = new Map();
 //     }
 // }
 
-
 let userData = new Map();
 // {
 //   tournamentID: {
@@ -67,13 +71,16 @@ app.use(abcCors());
 // app.get("/session", (server) => getSession(server));
 app.get("/wslobby", (server) => handleWebSocket(server, sockets));
 
-app.get("/wsgame", (server) => handleGamepageWs(games, server, sockets, tournaments));
-
-
+app.get("/wsgame", (server) =>
+  handleGamepageWs(games, server, sockets, tournaments)
+);
 
 app.get("/wsTournament", (server) =>
   handleTournamentWS(server, sockets, tournaments)
 );
+
+app.post("/sessions", (server, user_name) => createSession(server, user_name));
+
 app.post("/createTournament", (server) => createTournament(server));
 
 app.start({ port: 8080 });
@@ -96,4 +103,36 @@ async function createTournament(server) {
     console.log(error);
     return server.json({}, 500);
   }
+}
+
+async function createSession(server, user_name) {
+  const sessionId = v4.generate();
+  await client.queryArray({
+    text: `INSERT INTO sessions (uuid, name, tournament_id, created_at) VALUES ($sessionId, $user_name, $tournament_id, current_timestamp)`,
+    args: {
+      sessionId: sessionId,
+      user_name: user_name,
+      tournament_id: tournament_id,
+    },
+  });
+
+  const expiryDate = newDate(newDate().getTime() + 7 * 24 * 60 * 60 * 1000);
+  await server.setCookie({
+    name: "sessionId",
+    value: sessionId,
+    expires: expiryDate,
+    path: "/",
+  });
+  await server.setCookie({
+    name: "user_name",
+    value: user_name,
+    expires: expiryDate,
+    path: "/",
+  });
+  await server.setCookie({
+    name: "tournament_id",
+    value: tournament_id,
+    expires: expiryDate,
+    path: "/",
+  });
 }
