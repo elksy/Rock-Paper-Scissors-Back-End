@@ -105,16 +105,8 @@ async function createTournament(server) {
   }
 }
 
-async function createSession(server, user_name) {
+async function createSession(server) {
   const sessionId = v4.generate();
-  await client.queryArray({
-    text: `INSERT INTO sessions (uuid, name, tournament_id, created_at) VALUES ($sessionId, $user_name, $tournament_id, current_timestamp)`,
-    args: {
-      sessionId: sessionId,
-      user_name: user_name,
-      tournament_id: tournament_id,
-    },
-  });
 
   const expiryDate = newDate(newDate().getTime() + 7 * 24 * 60 * 60 * 1000);
   await server.setCookie({
@@ -123,12 +115,7 @@ async function createSession(server, user_name) {
     expires: expiryDate,
     path: "/",
   });
-  await server.setCookie({
-    name: "user_name",
-    value: user_name,
-    expires: expiryDate,
-    path: "/",
-  });
+
   await server.setCookie({
     name: "tournament_id",
     value: tournament_id,
