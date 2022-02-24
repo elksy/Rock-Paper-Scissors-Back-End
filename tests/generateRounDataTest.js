@@ -71,6 +71,44 @@ Deno.test("16 man Tournament bracket created for when started", () => {
   assertEquals(bracket[0].title, "Round of 16");
 });
 
+Deno.test("Can choose to add bots or byes", () => {
+  generateRoundData(fourPlayers, true);
+  generateRoundData(fourPlayers, false);
+  assertEquals(true, true);
+});
+
+Deno.test(
+  "If chosen to add bots, bots will be added if not enough players",
+  () => {
+    const botName = "Bot";
+    const bracket = generateRoundData(
+      [...fourPlayers, { name: "Team E", bgColor: "purple", textColor: "red" }],
+      true
+    );
+
+    assertEquals(bracket[0].seeds[1].teams[1].name.includes(botName), true);
+    assertEquals(bracket[0].seeds[2].teams[1].name.includes(botName), true);
+    assertEquals(bracket[0].seeds[3].teams[1].name.includes(botName), true);
+  }
+);
+
+Deno.test(
+  "If chosen to have byes, empty spaces will be null, and players without opponents will move on to the next round",
+  () => {
+    const bracket = generateRoundData(
+      [...fourPlayers, { name: "Team E", bgColor: "purple", textColor: "red" }],
+      false
+    );
+
+    assertEquals(bracket[0].seeds[1].teams[1], null);
+    assertEquals(bracket[0].seeds[2].teams[1], null);
+    assertEquals(bracket[0].seeds[3].teams[1], null);
+    assertEquals(bracket[1].seeds[0].teams[1].hasOwnProperty("name"), true);
+    assertEquals(bracket[1].seeds[1].teams[0].hasOwnProperty("name"), true);
+    assertEquals(bracket[1].seeds[1].teams[1].hasOwnProperty("name"), true);
+  }
+);
+
 // Deno.test("Players in tournament will have wins and isPlaying property", () => {
 //   const matchWins = 3;
 //   const players = 4;
@@ -200,9 +238,6 @@ Deno.test("16 man Tournament bracket created for when started", () => {
 //   assertEquals(tournament.bracket[1][1][0].playerName, "p1");
 // });
 
-// still makes bracket when players not power of 2
-// choose allow bots
-
 // enough wins will send player to next round, in proper position
 
 // cannot add points to players not in bracket right now, not in losers or people who are already in next round
@@ -215,7 +250,3 @@ Deno.test("16 man Tournament bracket created for when started", () => {
 // isplaying true
 
 // winner at the end
-
-// // no spaces
-// bots
-// byes
