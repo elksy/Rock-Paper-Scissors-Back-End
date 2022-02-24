@@ -12,16 +12,10 @@ import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
 // We need to set up a strict cors policy that works for http and websockets
 const CorsConfig = {
-  methods: "GET",
-  origin: "*",
-  allowedHeaders: [
-    "Authorization",
-    "Content-Type",
-    "Accept",
-    "Origin",
-    "User-Agent",
-  ],
-  credentials: true,
+	methods: "GET",
+	origin: "*",
+	allowedHeaders: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
+	credentials: true,
 };
 
 const app = new Application();
@@ -41,6 +35,14 @@ let tournaments = new Map();
 // tournamnetID: [tournament bracket data]
 // }
 
+
+let games = new Map();
+// {
+//     uuid: socket,
+//     uuid: socket,
+//     uuid: socket,
+//   }
+
 let tournamentInfo = new Map();
 //  { tournamentId : {
 //       rounds: rounds,
@@ -49,6 +51,7 @@ let tournamentInfo = new Map();
 //       type: type,
 //     }
 // }
+
 
 let userData = new Map();
 // {
@@ -63,10 +66,16 @@ let userData = new Map();
 app.use(abcCors());
 // app.get("/session", (server) => getSession(server));
 app.get("/wslobby", (server) => handleWebSocket(server, sockets));
+
+app.get("/wsgame", (server) => handleGamepageWs(games, server, sockets, tournaments));
+
+
+
 app.get("/wsTournament", (server) =>
   handleTournamentWS(server, sockets, tournaments)
 );
 app.post("/createTournament", (server) => createTournament(server));
+
 app.start({ port: 8080 });
 
 console.log(`server listening on http://localhost:8080`);
