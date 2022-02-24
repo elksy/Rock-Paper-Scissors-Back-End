@@ -108,7 +108,7 @@ async function createTournament(server) {
 async function createSession(server) {
   const sessionId = v4.generate();
 
-  const sessionData = {
+  const userData = {
     playerName: playerName,
     playerColour: playerColour,
     tournamentId: tournamentId,
