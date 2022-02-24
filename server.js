@@ -6,16 +6,22 @@ import handleTournamentWS from "./serverTournamentWs.js";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
 // Fetches the environment variables to set up the correct PORT
-// const DENO_ENV = (await Deno.env.get("DENO_ENV")) ?? "development";
-// config({ path: `./.env.${DENO_ENV}`, export: true });
-// const PORT = parseInt(Deno.env.get("PORT"));
+const DENO_ENV = (await Deno.env.get("DENO_ENV")) ?? "development";
+config({ path: `./.env.${DENO_ENV}`, export: true });
+const PORT = parseInt(Deno.env.get("PORT"));
 
 // We need to set up a strict cors policy that works for http and websockets
 const CorsConfig = {
-	methods: "GET",
-	origin: "*",
-	allowedHeaders: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
-	credentials: true,
+  methods: "GET",
+  origin: "*",
+  allowedHeaders: [
+    "Authorization",
+    "Content-Type",
+    "Accept",
+    "Origin",
+    "User-Agent",
+  ],
+  credentials: true,
 };
 
 const app = new Application();
@@ -35,7 +41,6 @@ let tournaments = new Map();
 // tournamnetID: [tournament bracket data]
 // }
 
-
 let games = new Map();
 // {
 //     uuid: socket,
@@ -52,7 +57,6 @@ let tournamentInfo = new Map();
 //     }
 // }
 
-
 let userData = new Map();
 // {
 //   tournamentID: {
@@ -63,22 +67,22 @@ let userData = new Map();
 //   }
 // }
 
-app.use(abcCors());
+app.use(abcCors(CorsConfig));
 // app.get("/session", (server) => getSession(server));
 app.get("/wslobby", (server) => handleWebSocket(server, sockets));
 
-app.get("/wsgame", (server) => handleGamepageWs(games, server, sockets, tournaments));
-
-
+app.get("/wsgame", (server) =>
+  handleGamepageWs(games, server, sockets, tournaments)
+);
 
 app.get("/wsTournament", (server) =>
   handleTournamentWS(server, sockets, tournaments)
 );
 app.post("/createTournament", (server) => createTournament(server));
 
-app.start({ port: 8080 });
+app.start({ port: PORT });
 
-console.log(`server listening on http://localhost:8080`);
+console.log(`server listening on http://localhost:${PORT}`);
 
 async function createTournament(server) {
   try {
