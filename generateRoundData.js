@@ -1,10 +1,12 @@
+// allow choose seed
+
 function generateRoundData(players, includeBots = false) {
   const rounds = [];
   const numOfRounds = Math.ceil(Math.log2(players.length));
   let numOfMatches = 1;
   let id = 2 ** numOfRounds - 1;
   let roundNameIndex = 0;
-  const roundNames = ["Finals", "Semi Final", "Quarter Finals", "Round of 16"];
+  const roundNames = ["Finals", "Semi Finals", "Quarter Finals", "Round of 16"];
 
   function makeSeed(id) {
     return {
