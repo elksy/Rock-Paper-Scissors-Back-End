@@ -67,7 +67,6 @@ let userData = new Map();
 //   }
 // }
 
-
 app.use(abcCors(CorsConfig));
 // app.get("/session", (server) => getSession(server));
 app.get("/wslobby/:tournamentId", (server) =>
@@ -84,9 +83,7 @@ app.get("/wsTournament", (server) =>
 
 app.get("/getTournamentInfo/:id", (server) => getTournamentInfo(server));
 
-
 app.post("/sessions", (server) => createSession(server));
-
 
 app.post("/createTournament", (server) => createTournament(server));
 
@@ -116,7 +113,6 @@ async function createTournament(server) {
   }
 }
 
-
 async function getTournamentInfo(server) {
   try {
     const { id } = await server.params;
@@ -129,33 +125,33 @@ async function getTournamentInfo(server) {
     return server.json({ valid: false });
   }
 
-async function createSession(server) {
-  const sessionId = v4.generate();
+  async function createSession(server) {
+    const sessionId = v4.generate();
 
-  const userData = {
-    playerName: playerName,
-    playerColour: playerColour,
-    tournamentId: tournamentId,
-  };
-  sessionInfo.set(sessionId, sessionData);
-  const expiryDate = newDate(newDate().getTime() + 7 * 24 * 60 * 60 * 1000);
-  await server.setCookie({
-    name: "sessionId",
-    value: sessionId,
-    expires: expiryDate,
-    path: "/",
-  });
-  await server.setCookie({
-    name: "playerColour",
-    value: playerColour,
-    expires: expiryDate,
-    path: "/",
-  });
-  await server.setCookie({
-    name: "tournament_id",
-    value: tournament_id,
-    expires: expiryDate,
-    path: "/",
-  });
-
+    const userData = {
+      playerName: playerName,
+      playerColour: playerColour,
+      tournamentId: tournamentId,
+    };
+    sessionInfo.set(sessionId, sessionData);
+    const expiryDate = newDate(newDate().getTime() + 7 * 24 * 60 * 60 * 1000);
+    await server.setCookie({
+      name: "sessionId",
+      value: sessionId,
+      expires: expiryDate,
+      path: "/",
+    });
+    await server.setCookie({
+      name: "playerColour",
+      value: playerColour,
+      expires: expiryDate,
+      path: "/",
+    });
+    await server.setCookie({
+      name: "tournament_id",
+      value: tournament_id,
+      expires: expiryDate,
+      path: "/",
+    });
+  }
 }
