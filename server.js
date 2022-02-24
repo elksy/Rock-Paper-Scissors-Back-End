@@ -28,7 +28,7 @@ const app = new Application();
 
 let sockets = new Map();
 // {
-// tournamnetID: {
+// tournamnetID: Map{
 //     uuid: socket,
 //     uuid: socket,
 //     uuid: socket,
@@ -60,9 +60,15 @@ let userData = new Map();
 //   }
 // }
 
+
+
+
+
 app.use(abcCors());
 // app.get("/session", (server) => getSession(server));
-app.get("/wslobby/:id", (server) => handleWebSocket(server, sockets, userData));
+app.get("/wslobby/:tournamentId", (server) =>
+  handleWebSocket(server, sockets, userData)
+);
 app.get("/wsTournament", (server) =>
   handleTournamentWS(server, sockets, tournaments)
 );
@@ -83,7 +89,10 @@ async function createTournament(server) {
       type: type,
     };
     tournamentInfo.set(tournamentId, tournamentData);
-    tournaments.set(tournamentId, {});
+    let socketsMap = new Map();
+    let usersMap = new Map();
+    sockets.set(tournamentId, socketsMap);
+    userData.set(tournamentId, usersMap);
     return server.json({ tournamentId: tournamentId }, 200);
   } catch (error) {
     console.log(error);
