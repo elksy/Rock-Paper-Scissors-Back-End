@@ -23,7 +23,7 @@ await client.queryArray(
 await client.queryArray(
   `CREATE TABLE sessions (
         uuid INTEGER NOT NULL,
-        name TEXT NOT NULL,
+        playerName TEXT NOT NULL,
         tournament_id INTEGER NOT NULL,
         host BOOLEAN DEFAULT FALSE,
         created_at timestamp with time zone NOT NULL,

@@ -79,7 +79,7 @@ app.get("/wsTournament", (server) =>
   handleTournamentWS(server, sockets, tournaments)
 );
 
-app.post("/sessions", (server, user_name) => createSession(server, user_name));
+app.post("/sessions", (server) => createSession(server));
 
 app.post("/createTournament", (server) => createTournament(server));
 
@@ -108,6 +108,12 @@ async function createTournament(server) {
 async function createSession(server) {
   const sessionId = v4.generate();
 
+  const sessionData = {
+    playerName: playerName,
+    playerColour: playerColour,
+    tournamentId: tournamentId,
+  };
+  sessionInfo.set(sessionId, sessionData);
   const expiryDate = newDate(newDate().getTime() + 7 * 24 * 60 * 60 * 1000);
   await server.setCookie({
     name: "sessionId",
@@ -115,7 +121,12 @@ async function createSession(server) {
     expires: expiryDate,
     path: "/",
   });
-
+  await server.setCookie({
+    name: "playerColour",
+    value: playerColour,
+    expires: expiryDate,
+    path: "/",
+  });
   await server.setCookie({
     name: "tournament_id",
     value: tournament_id,
