@@ -60,7 +60,7 @@ let userData = new Map();
 //   }
 // }
 
-app.use(abcCors("*"));
+app.use(abcCors());
 // app.get("/session", (server) => getSession(server));
 app.get("/wslobby", (server) => handleWebSocket(server, sockets));
 app.get("/wsTournament", (server) =>
