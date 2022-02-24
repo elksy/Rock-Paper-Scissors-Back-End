@@ -1,7 +1,7 @@
 import { Application } from "https://deno.land/x/abc@v1.3.3/mod.ts";
 import { abcCors } from "https://deno.land/x/cors/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
-import handleWebSocket from "./server-websocket.js";
+import handleWebSocket from "./serverLobbyWs.js";
 import handleTournamentWS from "./serverTournamentWs.js";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
@@ -28,7 +28,7 @@ const app = new Application();
 
 let sockets = new Map();
 // {
-// tournamnetID: {
+// tournamnetID: Map{
 //     uuid: socket,
 //     uuid: socket,
 //     uuid: socket,
@@ -67,9 +67,12 @@ let userData = new Map();
 //   }
 // }
 
+
 app.use(abcCors(CorsConfig));
 // app.get("/session", (server) => getSession(server));
-app.get("/wslobby", (server) => handleWebSocket(server, sockets));
+app.get("/wslobby/:tournamentId", (server) =>
+  handleWebSocket(server, sockets, userData)
+);
 
 app.get("/wsgame", (server) =>
   handleGamepageWs(games, server, sockets, tournaments)
@@ -79,7 +82,11 @@ app.get("/wsTournament", (server) =>
   handleTournamentWS(server, sockets, tournaments)
 );
 
+app.get("/getTournamentInfo/:id", (server) => getTournamentInfo(server));
+
+
 app.post("/sessions", (server) => createSession(server));
+
 
 app.post("/createTournament", (server) => createTournament(server));
 
@@ -98,12 +105,29 @@ async function createTournament(server) {
       type: type,
     };
     tournamentInfo.set(tournamentId, tournamentData);
+    let socketsMap = new Map();
+    let usersMap = new Map();
+    sockets.set(tournamentId, socketsMap);
+    userData.set(tournamentId, usersMap);
     return server.json({ tournamentId: tournamentId }, 200);
   } catch (error) {
     console.log(error);
     return server.json({}, 500);
   }
 }
+
+
+async function getTournamentInfo(server) {
+  try {
+    const { id } = await server.params;
+    if (tournamentInfo.has(id)) {
+      const tournamentData = tournamentInfo.get(id);
+      tournamentData["id"] = id;
+      return server.json({ valid: true, data: tournamentData });
+    } else return server.json({ valid: false });
+  } catch (error) {
+    return server.json({ valid: false });
+  }
 
 async function createSession(server) {
   const sessionId = v4.generate();
@@ -133,4 +157,5 @@ async function createSession(server) {
     expires: expiryDate,
     path: "/",
   });
+
 }
