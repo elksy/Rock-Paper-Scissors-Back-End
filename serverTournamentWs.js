@@ -7,7 +7,7 @@ import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
 const handleTournamentWS = async (server, sockets, tournaments, userData) => {
   const uuid = getUserUUID(server);
-  const tournamentID = getTournamentID(server);
+  const { tournamentId } = await server.params;
   const { conn, headers, r: bufReader, w: bufWriter } = server.request;
   const ws = await acceptWebSocket({
     conn,
@@ -15,7 +15,7 @@ const handleTournamentWS = async (server, sockets, tournaments, userData) => {
     bufReader,
     bufWriter,
   }).then((ws) =>
-    handleEvent(ws, sockets, tournaments, uuid, tournamentID, userData)
+    handleEvent(ws, sockets, tournaments, uuid, tournamentId, userData)
   );
 };
 
@@ -27,13 +27,12 @@ async function handleEvent(
   tournamentID,
   userData
 ) {
-  // Handle the initial connection. Add the players ws to the sockets map and send them the initial tournament data.
   addUserSocket(ws, sockets, uuid, tournamentID);
   sendTournamentBracket(ws, tournaments.get(tournamentID));
-
+  setTimeout(() => ws.send(JSON.stringify({ command: "Start Round" }), 5000));
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
-      removeWebSocket(sockets, uuid, tournamentID);
+      sockets.get(tournamentID).delete(uuid);
       // Need to also update the bracket and maybe replace player with a bot.
       // Right now a close event should only happen once the tournament is finished and we re-direct players to the winners-page
     } else {
@@ -49,14 +48,9 @@ async function getUserUUID(server) {
   return "33413";
 }
 
-async function getTournamentID(server) {
-  //   const { tournamentID } = await server.params;
-  // return tournamentID
-  return 1;
-}
-
 function addUserSocket(ws, sockets, uuid, tournamentID) {
   const tournamentSockets = sockets.get(tournamentID);
+
   tournamentSockets[uuid] = ws;
   sockets.set(tournamentID, tournamentSockets);
 }
@@ -85,12 +79,11 @@ async function updateBracket(
       sendTournamentBracket(uuid.ws, newBracket);
     }
 
-    const startNextRound = startNextRound(newBracket);
-    if (startNextRound) {
+    if (startNextRound(newBracket, result.round)) {
       // maybe set a timeout here for a few seconds
-      for (let uuid of tournamentSockets) {
-        sendTournamentBracket(uuid.ws, newBracket);
-      }
+      sockets.get(tournamentID).array.forEach((ws) => {
+        ws.send(JSON.stringify({ command: "Start Round" }));
+      });
     }
   }
 }
@@ -118,12 +111,20 @@ export async function updateTournamentBracket(
   return currentBracket;
 }
 
-//export default handleTournamentWS;
+// Return true or false if
+function startNextRound(bracket, round) {
+  if (round === bracket.length - 1) {
+    return true;
+  }
+  for (match of bracket[round + 1].seeds) {
+    if (
+      !match.teams[0].hasOwnProperty("name") ||
+      !match.teams[1].hasOwnProperty("name")
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
 
-// Should check if all matches from a round and see if they are complete. Send back boolean
-//startNextRound()
-
-// takes the result and updates the tournament bracket
-// updateTournamentBracket(tournament, tournamentID, result) {
-
-// }
+export default handleTournamentWS;

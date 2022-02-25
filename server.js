@@ -77,7 +77,7 @@ app.get("/wsgame", (server) =>
   handleGamepageWs(games, server, sockets, tournaments)
 );
 
-app.get("/wsTournament", (server) =>
+app.get("/wsTournament/:tournamentId", (server) =>
   handleTournamentWS(server, sockets, tournaments, userData)
 );
 
@@ -100,6 +100,7 @@ async function createTournament(server) {
       timeLimit: timeLimit,
       addBots: addBots,
       type: type,
+      id: tournamentId,
     };
     tournamentInfo.set(tournamentId, tournamentData);
     let socketsMap = new Map();
@@ -118,7 +119,6 @@ async function getTournamentInfo(server) {
     const { id } = await server.params;
     if (tournamentInfo.has(id)) {
       const tournamentData = tournamentInfo.get(id);
-      tournamentData["id"] = id;
       return server.json({ valid: true, data: tournamentData });
     } else return server.json({ valid: false });
   } catch (error) {
