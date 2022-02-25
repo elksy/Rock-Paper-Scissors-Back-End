@@ -1,6 +1,13 @@
 // allow choose seed
 
-function generateRoundData(players, includeBots = false, shuffleSeed = 0) {
+function generateRoundData(
+  userData,
+  tournamentID,
+  includeBots = false,
+  shuffleSeed = 0
+) {
+  let players = Array.from(userData.get(tournamentID).values());
+
   const rounds = [];
   const numOfRounds = Math.ceil(Math.log2(players.length));
   let numOfMatches = 1;
@@ -101,6 +108,19 @@ function generateRoundData(players, includeBots = false, shuffleSeed = 0) {
 
   return rounds;
 }
+
+// function addBotsOrByes(players, addBots = true) {
+//   const numOfPlayersNeeded = 2 ** Math.ceil(Math.log2(players.length));
+//   if (addBots) {
+//     while (players.length < numOfPlayersNeeded) {
+//       players.push({ name: "Bot", bgColor: "Grey", textColor: "White" });
+//     }
+//   } else {
+//     while (players.length < numOfPlayersNeeded) {
+//       players;
+//     }
+//   }
+// }
 
 export default generateRoundData;
 // const players = [
