@@ -70,7 +70,7 @@ let userData = new Map();
 app.use(abcCors(CorsConfig));
 // app.get("/session", (server) => getSession(server));
 app.get("/wslobby/:tournamentId", (server) =>
-  handleWebSocket(server, sockets, userData)
+  handleWebSocket(server, sockets, userData, tournaments, tournamentInfo)
 );
 
 app.get("/wsgame", (server) =>

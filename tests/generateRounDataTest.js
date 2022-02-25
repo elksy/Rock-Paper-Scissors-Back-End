@@ -141,16 +141,21 @@ Deno.test(
 );
 
 Deno.test(
-  "If chosen to have byes, empty spaces will be null, and players without opponents will move on to the next round",
+  "If chosen to have byes, empty spaces will be null, and players without opponents will move on to the next round in the right position",
   () => {
     const bracket = generateRoundData(userData, "fiveManTournament", false);
 
     assertEquals(bracket[0].seeds[1].teams[1], null);
     assertEquals(bracket[0].seeds[2].teams[1], null);
     assertEquals(bracket[0].seeds[3].teams[1], null);
-    assertEquals(bracket[1].seeds[0].teams[1].hasOwnProperty("name"), true);
-    assertEquals(bracket[1].seeds[1].teams[0].hasOwnProperty("name"), true);
-    assertEquals(bracket[1].seeds[1].teams[1].hasOwnProperty("name"), true);
+
+    const firstPlayer = bracket[0].seeds[1].teams[0];
+    const secondPlayer = bracket[0].seeds[2].teams[0];
+    const thirdPlayer = bracket[0].seeds[3].teams[0];
+
+    assertEquals(bracket[1].seeds[0].teams[1], firstPlayer);
+    assertEquals(bracket[1].seeds[1].teams[0], secondPlayer);
+    assertEquals(bracket[1].seeds[1].teams[1], thirdPlayer);
   }
 );
 
@@ -231,17 +236,6 @@ Deno.test("Can play out whole tournament", async () => {
   assertEquals(true, true);
 });
 
-// play tournament with byes
-
-// enough wins will send player to next round, in proper position
-
-// cannot add points to players not in bracket right now, not in losers or people who are already in next round
-// wins reset
-
-//ppl who lose isPlaying false
-//ppl who win isPlaying false
-
 // when all matches are done in round, current bracket changes
-// isplaying true
 
 // winner at the end

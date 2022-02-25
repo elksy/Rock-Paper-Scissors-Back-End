@@ -4,8 +4,15 @@ import {
   isWebSocketCloseEvent,
 } from "https://deno.land/std@0.99.0/ws/mod.ts";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
+import generateRoundData from "./generateRoundData";
 
-const handleWebSocket = async (server, sockets, userData) => {
+const handleWebSocket = async (
+  server,
+  sockets,
+  userData,
+  tournaments,
+  tournamentInfo
+) => {
   const uuid = v4.generate();
   const { tournamentId } = await server.params;
   const { conn, headers, r: bufReader, w: bufWriter } = server.request;
@@ -14,10 +21,28 @@ const handleWebSocket = async (server, sockets, userData) => {
     headers,
     bufReader,
     bufWriter,
-  }).then((ws) => handleEvent(ws, sockets, userData, uuid, tournamentId));
+  }).then((ws) =>
+    handleEvent(
+      ws,
+      sockets,
+      userData,
+      uuid,
+      tournamentId,
+      tournaments,
+      tournamentInfo
+    )
+  );
 };
 
-async function handleEvent(ws, sockets, userData, uuid, tournamentID) {
+async function handleEvent(
+  ws,
+  sockets,
+  userData,
+  uuid,
+  tournamentID,
+  tournaments,
+  tournamentInfo
+) {
   await addUserSocket(ws, sockets, uuid, tournamentID);
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
@@ -32,7 +57,14 @@ async function handleEvent(ws, sockets, userData, uuid, tournamentID) {
         await addNewPlayerData(event, userData, uuid, tournamentID);
         await updatePlayersList(sockets, userData, tournamentID);
       } else if ("message" in event) {
-        startGame(event, sockets, tournamentID);
+        startGame(
+          event,
+          sockets,
+          tournamentID,
+          userData,
+          tournaments,
+          tournamentInfo
+        );
       }
     }
   }
@@ -63,7 +95,19 @@ async function getPlayersList(userData, tournamentID) {
   return players;
 }
 
-async function startGame(event, sockets, tournamentId) {
+async function startGame(
+  event,
+  sockets,
+  tournamentId,
+  userData,
+  tournaments,
+  tournamentInfo
+) {
+  const info = tournamentInfo.get(tournamentId);
+  tournaments.set(
+    tournamentId,
+    generateRoundData(userData, tournamentId, info.addBots)
+  );
   const tournamentSockets = await sockets.get(tournamentId); // returns a Map of the sockets
   tournamentSockets.forEach((ws) => {
     ws.send(JSON.stringify({ message: "Start Game" }));
