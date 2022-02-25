@@ -77,7 +77,8 @@ async function updateBracket(
     const newBracket = await updateTournamentBracket(
       tournaments,
       tournamentID,
-      result // winner round { winner: uuid, round: index, roundMatch: index, score: [score,score]}
+      result, // winner round { winner: uuid, round: index, roundMatch: index, score: [score,score]}
+      userData
     );
     const tournamentSockets = sockets.get(tournamentID);
     for (let uuid of tournamentSockets) {
@@ -97,7 +98,8 @@ async function updateBracket(
 export async function updateTournamentBracket(
   tournaments,
   tournamentID,
-  result
+  result,
+  userData
 ) {
   let currentBracket = await tournaments.get(tournamentID);
   currentBracket[result.round].seeds[result.roundMatch].score = result.score;
@@ -109,14 +111,14 @@ export async function updateTournamentBracket(
       .get(tournamentID)
       .get(result.winner);
   }
-  await tournaments.set(tournamentID, currentBracket);
 
   if (result.round === currentBracket.length - 1) {
     // endTournament() placeholder func
   }
+  return currentBracket;
 }
 
-export default handleTournamentWS;
+//export default handleTournamentWS;
 
 // Should check if all matches from a round and see if they are complete. Send back boolean
 //startNextRound()
