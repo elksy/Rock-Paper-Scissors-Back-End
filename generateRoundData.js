@@ -1,6 +1,6 @@
 // allow choose seed
 
-function generateRoundData(players, includeBots = false) {
+function generateRoundData(players, includeBots = false, shuffleSeed = 0) {
   const rounds = [];
   const numOfRounds = Math.ceil(Math.log2(players.length));
   let numOfMatches = 1;
@@ -50,7 +50,7 @@ function generateRoundData(players, includeBots = false) {
     }
   }
 
-  function shuffle(array, seed = Date.now()) {
+  function shuffle(array, seed) {
     let currentIndex = array.length;
     let temporaryValue, randomIndex;
 
@@ -94,7 +94,7 @@ function generateRoundData(players, includeBots = false) {
   }
 
   createRounds();
-  players = shuffle(players);
+  players = shuffle(players, shuffleSeed ? shuffleSeed : Date.now());
   fillForMissingPlayers();
   seedPlayers();
   resolveByes();

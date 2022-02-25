@@ -76,7 +76,7 @@ app.get("/wsgame", (server) =>
 );
 
 app.get("/wsTournament", (server) =>
-  handleTournamentWS(server, sockets, tournaments)
+  handleTournamentWS(server, sockets, tournaments, userData)
 );
 app.post("/createTournament", (server) => createTournament(server));
 

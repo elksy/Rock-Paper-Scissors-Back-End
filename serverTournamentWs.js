@@ -5,7 +5,7 @@ import {
 } from "https://deno.land/std@0.99.0/ws/mod.ts";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
-const handleTournamentWS = async (server, sockets, tournaments) => {
+const handleTournamentWS = async (server, sockets, tournaments, userData) => {
   const uuid = getUserUUID(server);
   const tournamentID = getTournamentID(server);
   const { conn, headers, r: bufReader, w: bufWriter } = server.request;
@@ -14,10 +14,19 @@ const handleTournamentWS = async (server, sockets, tournaments) => {
     headers,
     bufReader,
     bufWriter,
-  }).then((ws) => handleEvent(ws, sockets, tournaments, uuid, tournamentID));
+  }).then((ws) =>
+    handleEvent(ws, sockets, tournaments, uuid, tournamentID, userData)
+  );
 };
 
-async function handleEvent(ws, sockets, tournaments, uuid, tournamentID) {
+async function handleEvent(
+  ws,
+  sockets,
+  tournaments,
+  uuid,
+  tournamentID,
+  userData
+) {
   // Handle the initial connection. Add the players ws to the sockets map and send them the initial tournament data.
   addUserSocket(ws, sockets, uuid, tournamentID);
   sendTournamentBracket(ws, tournaments.get(tournamentID));
@@ -29,7 +38,7 @@ async function handleEvent(ws, sockets, tournaments, uuid, tournamentID) {
       // Right now a close event should only happen once the tournament is finished and we re-direct players to the winners-page
     } else {
       const event = JSON.parse(e);
-      updateBracket(event, sockets, tournaments, uuid, tournamentID);
+      updateBracket(event, sockets, tournaments, uuid, tournamentID, userData);
     }
   }
 }
@@ -56,13 +65,19 @@ function sendTournamentBracket(ws, bracket) {
   ws.send(JSON.stringify({ bracket: bracket }));
 }
 
-async function updateBracket(event, sockets, tournaments, tournamentID) {
+async function updateBracket(
+  event,
+  sockets,
+  tournaments,
+  tournamentID,
+  userData
+) {
   if ("result" in event) {
     const result = event.result;
     const newBracket = await updateTournamentBracket(
       tournaments,
       tournamentID,
-      result // winner round { winner: uuid, round: oeqklewjq}
+      result // winner round { winner: uuid, round: index, roundMatch: index, score: [score,score]}
     );
     const tournamentSockets = sockets.get(tournamentID);
     for (let uuid of tournamentSockets) {
@@ -79,8 +94,26 @@ async function updateBracket(event, sockets, tournaments, tournamentID) {
   }
 }
 
-async function updateTournamentBracket(tournaments, tournamentID, result) {
-  let currentBracket = tournaments.get(tournamentID);
+export async function updateTournamentBracket(
+  tournaments,
+  tournamentID,
+  result
+) {
+  let currentBracket = await tournaments.get(tournamentID);
+  currentBracket[result.round].seeds[result.roundMatch].score = result.score;
+
+  if (result.round < currentBracket.length - 1) {
+    currentBracket[result.round + 1].seeds[
+      Math.floor(result.roundMatch / 2)
+    ].teams[result.roundMatch % 2] = await userData
+      .get(tournamentID)
+      .get(result.winner);
+  }
+  await tournaments.set(tournamentID, currentBracket);
+
+  if (result.round === currentBracket.length - 1) {
+    // endTournament() placeholder func
+  }
 }
 
 export default handleTournamentWS;

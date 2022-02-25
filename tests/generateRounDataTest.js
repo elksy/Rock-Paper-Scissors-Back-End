@@ -1,5 +1,6 @@
 import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 import generateRoundData from "../generateRoundData.js";
+import updateTournamentBracket from "../serverTournamentWs.js";
 
 const twoPlayers = [
   { name: "Team A", bgColor: "red", textColor: "black" },
@@ -108,6 +109,23 @@ Deno.test(
     assertEquals(bracket[1].seeds[1].teams[1].hasOwnProperty("name"), true);
   }
 );
+
+Deno.test("Adding a match result, moves them to the next round", async () => {
+  const tournamentID = "tourney1";
+  const playerIds = [1, 2, 3, 4, 5, 6, 7, 8];
+  const tournaments = new Map();
+  const tournamentPlayers = new Map();
+  const userData = new Map();
+  tournaments.set(tournamentID, generateRoundData(eightPlayers));
+  for (let i = 0; i < playerIds.length; i++) {
+    tournamentPlayers.set(playerIds[i], eightPlayers[i]);
+  }
+  userData.set(tournamentID, tournamentPlayers);
+  const currBracket = tournaments.get(tournamentID);
+  console.log(currBracket[0].seeds);
+
+  //updateTournamentBracket(tournaments, tournamentID, result);
+});
 
 // Deno.test("Players in tournament will have wins and isPlaying property", () => {
 //   const matchWins = 3;
