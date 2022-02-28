@@ -6,63 +6,48 @@ import {
 
 //send opp choice
 
-const handleGamepageWs = async (games, server, sockets, tournaments) => {
+const handleGamepageWs = async (server, games) => {
   const uuid = getUserUUID(server);
-  //const tournamentID = getTournamentID(server);
+
   const { conn, headers, r: bufReader, w: bufWriter } = server.request;
   const ws = await acceptWebSocket({
     conn,
     headers,
     bufReader,
     bufWriter,
-  }).then((ws) =>
-    handleEvent(games, ws, sockets, tournaments, uuid, tournamentID)
-  );
+  }).then((ws) => handleEvent(ws, server, games, uuid));
 };
 
-async function handleEvent(
-  games,
-  ws,
-  sockets,
-  tournaments,
-  uuid,
-  tournamentID
-) {
-  console.log("wsGame");
+async function handleEvent(ws, server, games, uuid) {
   // Handle the initial connection. Add the players ws to the sockets map and send them the initial tournament data.
-  addGamesWs(ws, sockets, uuid, tournamentID);
-
+  addGamesWs(ws, games, uuid);
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
-      sockets.delete(uuid);
-      sendPlayerInfo(sockets);
+      games.delete(uuid);
     } else {
       const event = JSON.parse(e);
-      handlePlayerMove(games, event, uuid, tournaments, tournamentID);
+      handlePlayerMove(event, games, uuid);
     }
   }
 }
 
-function handlePlayerMove(event, uuid, tournaments, tournamentID) {
-  if ("option" in event) {
-    const opponentId = getOpponentId(event, uuid, tournaments, tournamentID);
-    games.get(opponentId).send(event.option);
+function handlePlayerMove(event, games, uuid) {
+  if ("choice" in event && "opponent" in event) {
+    console.log("sending move");
+    console.log(event);
+    const opp = games.get(event.opponent);
+    console.log(opp);
+    opp.send(event.option);
   }
 }
 
 async function getUserUUID(server) {
-  //   const { uuid } = await server.body;
-  return "33413";
+  const { sessionId } = await server.cookies;
+  return sessionId;
 }
 
-function addGamesWs(ws, uuid) {
-  // const tournamentSockets = sockets.get(tournamentID);
-  // tournamentSockets[uuid] = ws;
+function addGamesWs(ws, games, uuid) {
   games.set(uuid, ws);
-}
-
-function getOpponentId(event, uuid, tournaments, tournamentID) {
-  //use uuid to find opp in same tournament bracket
 }
 
 export default handleGamepageWs;

@@ -3,6 +3,7 @@ import { abcCors } from "https://deno.land/x/cors/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 import handleWebSocket from "./serverLobbyWs.js";
 import handleTournamentWS from "./serverTournamentWs.js";
+import handleGamepageWs from "./serverGamepageWs.js";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
 // Fetches the environment variables to set up the correct PORT
@@ -73,9 +74,7 @@ app.get("/wslobby/:tournamentId", (server) =>
   handleWebSocket(server, sockets, userData, tournaments, tournamentInfo)
 );
 
-app.get("/wsgame", (server) =>
-  handleGamepageWs(games, server, sockets, tournaments)
-);
+app.get("/wsgame", (server) => handleGamepageWs(server, games));
 
 app.get("/wsTournament/:tournamentId", (server) =>
   handleTournamentWS(server, sockets, tournaments, userData)
@@ -128,7 +127,6 @@ async function getTournamentInfo(server) {
 
 async function createSession(server) {
   const sessionId = v4.generate();
-  console.log(sessionId);
   const { playerName, playerColour } = await server.body;
   const expiryDate = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
   await server.setCookie({
