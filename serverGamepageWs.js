@@ -33,9 +33,6 @@ async function handleEvent(ws, server, games, uuid) {
 
 async function handlePlayerMove(event, games, uuid) {
   if ("choice" in event && "opponent" in event) {
-    console.log("sending move");
-    console.log(event.opponent, event.choice);
-    console.log(games);
     await games
       .get(event.opponent)
       .send(JSON.stringify({ opponentChoice: event.choice }));

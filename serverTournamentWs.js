@@ -42,20 +42,17 @@ async function handleEvent(
 }
 
 function sendInitialStart(ws) {
-  console.log("start");
   ws.send(JSON.stringify({ command: "Start Round" }));
 }
 
 async function getUserUUID(server) {
-  //   const { uuid } = await server.body;
-  // return tournamentID}
-  return "33413";
+  const { sessionId } = await server.cookies;
+  return sessionId;
 }
 
 function addUserSocket(ws, sockets, uuid, tournamentID) {
   const tournamentSockets = sockets.get(tournamentID);
-
-  tournamentSockets[uuid] = ws;
+  tournamentSockets.set(uuid, ws);
   sockets.set(tournamentID, tournamentSockets);
 }
 
@@ -78,16 +75,17 @@ async function updateBracket(
       result, // winner round { winner: uuid, round: index, roundMatch: index, score: [score,score]}
       userData
     );
-    const tournamentSockets = sockets.get(tournamentID);
+    const tournamentSockets = await sockets.get(tournamentID);
     tournamentSockets.forEach((ws) => {
-      sendTournamentBracket(ws, newBracket);
+      ws.send(JSON.stringify({ bracket: newBracket }));
     });
 
     if (startNextRound(newBracket, result.round)) {
-      // maybe set a timeout here for a few seconds
-      sockets.get(tournamentID).forEach((ws) => {
-        ws.send(JSON.stringify({ command: "Start Round" }));
-      });
+      setTimeout(() => {
+        sockets.get(tournamentID).forEach((ws) => {
+          ws.send(JSON.stringify({ command: "Start Round" }));
+        });
+      }, 7000);
     }
   }
 }
@@ -101,14 +99,11 @@ export async function updateTournamentBracket(
   let currentBracket = await tournaments.get(tournamentID);
 
   let roundMatch = null;
-  console.log(currentBracket);
-  console.log(result.seedId);
   for (let i = 0; i < currentBracket[result.round].seeds.length; i++) {
     if (currentBracket[result.round].seeds[i].id === result.seedId) {
       roundMatch = i;
     }
   }
-  console.log(roundMatch);
   const winnerInfo = await userData.get(tournamentID).get(result.winner);
   if (
     currentBracket[result.round].seeds[roundMatch].teams[0].name ===
@@ -142,14 +137,14 @@ function startNextRound(bracket, round) {
   if (round === bracket.length - 1) {
     return true;
   }
-  for (match of bracket[round + 1].seeds) {
-    if (
-      !match.teams[0].hasOwnProperty("name") ||
-      !match.teams[1].hasOwnProperty("name")
-    ) {
+  for (let match of bracket[round + 1].seeds) {
+    console.log(match.teams);
+    if (match.teams[0].name === "" || match.teams[1].name === "") {
+      console.log("false");
       return false;
     }
   }
+  console.log("true");
   return true;
 }
 

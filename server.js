@@ -129,8 +129,7 @@ async function getTournamentInfo(server) {
 
 async function createSession(server) {
   const sessionId = v4.generate();
-  console.log("sessionId");
-  console.log(sessionId);
+
   const { playerName, playerColour } = await server.body;
   const expiryDate = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
   await server.setCookie({

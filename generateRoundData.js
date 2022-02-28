@@ -18,7 +18,10 @@ function generateRoundData(
   function makeSeed(id) {
     return {
       id: id,
-      teams: [],
+      teams: [
+        { name: "", bgColor: "Grey", textColor: "Grey" },
+        { name: "", bgColor: "Grey", textColor: "Grey" },
+      ],
       score: [0, 0],
     };
   }
@@ -80,7 +83,7 @@ function generateRoundData(
     let index = 0;
     for (let i = 0; i < 2; i++) {
       for (const seed of rounds[0].seeds) {
-        seed.teams.push(players[index]);
+        seed.teams[i] = players[index];
         index++;
       }
     }
