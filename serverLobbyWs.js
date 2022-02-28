@@ -3,7 +3,6 @@ import {
   acceptable,
   isWebSocketCloseEvent,
 } from "https://deno.land/std@0.99.0/ws/mod.ts";
-import { v4 } from "https://deno.land/std/uuid/mod.ts";
 import generateRoundData from "./generateRoundData.js";
 
 const handleWebSocket = async (
@@ -13,7 +12,7 @@ const handleWebSocket = async (
   tournaments,
   tournamentInfo
 ) => {
-  const uuid = v4.generate(); //remove this later
+  const { sessionId } = await server.cookies;
   const { tournamentId } = await server.params;
   const { conn, headers, r: bufReader, w: bufWriter } = server.request;
   const ws = await acceptWebSocket({
@@ -26,7 +25,7 @@ const handleWebSocket = async (
       ws,
       sockets,
       userData,
-      uuid,
+      sessionId,
       tournamentId,
       tournaments,
       tournamentInfo

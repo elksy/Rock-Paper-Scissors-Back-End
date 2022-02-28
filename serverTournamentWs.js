@@ -3,7 +3,6 @@ import {
   acceptable,
   isWebSocketCloseEvent,
 } from "https://deno.land/std@0.99.0/ws/mod.ts";
-import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
 const handleTournamentWS = async (server, sockets, tournaments, userData) => {
   const uuid = getUserUUID(server);
@@ -29,7 +28,7 @@ async function handleEvent(
 ) {
   addUserSocket(ws, sockets, uuid, tournamentID);
   sendTournamentBracket(ws, tournaments.get(tournamentID));
-  setTimeout(() => ws.send(JSON.stringify({ command: "Start Round" }), 5000));
+  setTimeout(() => sendInitialStart(ws), 5000);
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
       sockets.get(tournamentID).delete(uuid);
@@ -37,21 +36,23 @@ async function handleEvent(
       // Right now a close event should only happen once the tournament is finished and we re-direct players to the winners-page
     } else {
       const event = JSON.parse(e);
-      updateBracket(event, sockets, tournaments, uuid, tournamentID, userData);
+      updateBracket(event, sockets, tournaments, tournamentID, userData);
     }
   }
 }
 
+function sendInitialStart(ws) {
+  ws.send(JSON.stringify({ command: "Start Round" }));
+}
+
 async function getUserUUID(server) {
-  //   const { uuid } = await server.body;
-  // return tournamentID}
-  return "33413";
+  const { sessionId } = await server.cookies;
+  return sessionId;
 }
 
 function addUserSocket(ws, sockets, uuid, tournamentID) {
   const tournamentSockets = sockets.get(tournamentID);
-
-  tournamentSockets[uuid] = ws;
+  tournamentSockets.set(uuid, ws);
   sockets.set(tournamentID, tournamentSockets);
 }
 
@@ -74,16 +75,17 @@ async function updateBracket(
       result, // winner round { winner: uuid, round: index, roundMatch: index, score: [score,score]}
       userData
     );
-    const tournamentSockets = sockets.get(tournamentID);
-    for (let uuid of tournamentSockets) {
-      sendTournamentBracket(uuid.ws, newBracket);
-    }
+    const tournamentSockets = await sockets.get(tournamentID);
+    tournamentSockets.forEach((ws) => {
+      ws.send(JSON.stringify({ bracket: newBracket }));
+    });
 
     if (startNextRound(newBracket, result.round)) {
-      // maybe set a timeout here for a few seconds
-      sockets.get(tournamentID).array.forEach((ws) => {
-        ws.send(JSON.stringify({ command: "Start Round" }));
-      });
+      setTimeout(() => {
+        sockets.get(tournamentID).forEach((ws) => {
+          ws.send(JSON.stringify({ command: "Start Round" }));
+        });
+      }, 7000);
     }
   }
 }
@@ -95,14 +97,33 @@ export async function updateTournamentBracket(
   userData
 ) {
   let currentBracket = await tournaments.get(tournamentID);
-  currentBracket[result.round].seeds[result.roundMatch].score = result.score;
+
+  let roundMatch = null;
+  for (let i = 0; i < currentBracket[result.round].seeds.length; i++) {
+    if (currentBracket[result.round].seeds[i].id === result.seedId) {
+      roundMatch = i;
+    }
+  }
+  const winnerInfo = await userData.get(tournamentID).get(result.winner);
+  if (
+    currentBracket[result.round].seeds[roundMatch].teams[0].name ===
+    winnerInfo.name
+  ) {
+    currentBracket[result.round].seeds[roundMatch].score = [
+      result.playerScore,
+      result.opponentScore,
+    ];
+  } else {
+    currentBracket[result.round].seeds[roundMatch].score = [
+      result.opponentScore,
+      result.playerScore,
+    ];
+  }
 
   if (result.round < currentBracket.length - 1) {
-    currentBracket[result.round + 1].seeds[
-      Math.floor(result.roundMatch / 2)
-    ].teams[result.roundMatch % 2] = await userData
-      .get(tournamentID)
-      .get(result.winner);
+    currentBracket[result.round + 1].seeds[Math.floor(roundMatch / 2)].teams[
+      roundMatch % 2
+    ] = await userData.get(tournamentID).get(result.winner);
   }
 
   if (result.round === currentBracket.length - 1) {
@@ -116,14 +137,14 @@ function startNextRound(bracket, round) {
   if (round === bracket.length - 1) {
     return true;
   }
-  for (match of bracket[round + 1].seeds) {
-    if (
-      !match.teams[0].hasOwnProperty("name") ||
-      !match.teams[1].hasOwnProperty("name")
-    ) {
+  for (let match of bracket[round + 1].seeds) {
+    console.log(match.teams);
+    if (match.teams[0].name === "" || match.teams[1].name === "") {
+      console.log("false");
       return false;
     }
   }
+  console.log("true");
   return true;
 }
 
