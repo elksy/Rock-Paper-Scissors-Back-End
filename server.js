@@ -13,7 +13,7 @@ const PORT = parseInt(Deno.env.get("PORT"));
 // We need to set up a strict cors policy that works for http and websockets
 const CorsConfig = {
   methods: "GET",
-  origin: "*",
+  origin: "http://localhost:3000",
   allowedHeaders: [
     "Authorization",
     "Content-Type",
@@ -124,34 +124,29 @@ async function getTournamentInfo(server) {
   } catch (error) {
     return server.json({ valid: false });
   }
+}
 
-  async function createSession(server) {
-    const sessionId = v4.generate();
-
-    const userData = {
-      playerName: playerName,
-      playerColour: playerColour,
-      tournamentId: tournamentId,
-    };
-    sessionInfo.set(sessionId, sessionData);
-    const expiryDate = newDate(newDate().getTime() + 7 * 24 * 60 * 60 * 1000);
-    await server.setCookie({
-      name: "sessionId",
-      value: sessionId,
-      expires: expiryDate,
-      path: "/",
-    });
-    await server.setCookie({
-      name: "playerColour",
-      value: playerColour,
-      expires: expiryDate,
-      path: "/",
-    });
-    await server.setCookie({
-      name: "tournament_id",
-      value: tournament_id,
-      expires: expiryDate,
-      path: "/",
-    });
-  }
+async function createSession(server) {
+  const sessionId = v4.generate();
+  console.log(sessionId);
+  const { playerName, playerColour } = await server.body;
+  const expiryDate = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
+  await server.setCookie({
+    name: "sessionId",
+    value: sessionId,
+    expires: expiryDate,
+    path: "/",
+  });
+  await server.setCookie({
+    name: "playerColour",
+    value: playerColour,
+    expires: expiryDate,
+    path: "/",
+  });
+  await server.setCookie({
+    name: "playerName",
+    value: playerName,
+    expires: expiryDate,
+    path: "/",
+  });
 }
