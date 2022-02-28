@@ -7,7 +7,7 @@ function generateRoundData(
   shuffleSeed = 0
 ) {
   let players = Array.from(userData.get(tournamentID).values());
-
+  console.log(userData);
   const rounds = [];
   const numOfRounds = Math.ceil(Math.log2(players.length));
   let numOfMatches = 1;

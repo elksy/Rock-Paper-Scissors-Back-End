@@ -7,7 +7,7 @@ import {
 //send opp choice
 
 const handleGamepageWs = async (server, games) => {
-  const uuid = getUserUUID(server);
+  const uuid = await getUserUUID(server);
 
   const { conn, headers, r: bufReader, w: bufWriter } = server.request;
   const ws = await acceptWebSocket({
@@ -31,13 +31,14 @@ async function handleEvent(ws, server, games, uuid) {
   }
 }
 
-function handlePlayerMove(event, games, uuid) {
+async function handlePlayerMove(event, games, uuid) {
   if ("choice" in event && "opponent" in event) {
     console.log("sending move");
-    console.log(event);
-    const opp = games.get(event.opponent);
-    console.log(opp);
-    opp.send(event.option);
+    console.log(event.opponent, event.choice);
+    console.log(games);
+    await games
+      .get(event.opponent)
+      .send(JSON.stringify({ opponentChoice: event.choice }));
   }
 }
 
@@ -46,8 +47,8 @@ async function getUserUUID(server) {
   return sessionId;
 }
 
-function addGamesWs(ws, games, uuid) {
-  games.set(uuid, ws);
+async function addGamesWs(ws, games, uuid) {
+  await games.set(uuid, ws);
 }
 
 export default handleGamepageWs;

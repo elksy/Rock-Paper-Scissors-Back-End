@@ -70,10 +70,13 @@ async function handleEvent(
 }
 
 async function addUserSocket(ws, sockets, uuid, tournamentID) {
+  console.log("adding using data");
+  console.log(uuid, tournamentID);
   await sockets.get(tournamentID).set(uuid, ws);
 }
 
 async function addNewPlayerData(event, userData, uuid, tournamentID) {
+  console.log(event, uuid);
   await userData.get(tournamentID).set(uuid, event.newPlayer);
 }
 
