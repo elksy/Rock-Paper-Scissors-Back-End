@@ -73,10 +73,12 @@ let userData = new Map();
 app.use(abcCors(CorsConfig));
 // app.get("/session", (server) => getSession(server));
 app.get("/wslobby/:tournamentId", (server) =>
-  handleWebSocket(server, sockets, userData, tournaments, tournamentInfo)
+  handleWebSocket(server, sockets, userData, tournaments, tournamentInfo, games)
 );
 
-app.get("/wsgame", (server) => handleGamepageWs(server, games));
+app.get("/wsgame/:tournamentId/:seedId", (server) =>
+  handleGamepageWs(server, games)
+);
 
 app.get("/wsTournament/:tournamentId", (server) =>
   handleTournamentWS(server, sockets, tournaments, userData)
@@ -108,8 +110,10 @@ async function createTournament(server) {
     tournamentInfo.set(tournamentId, tournamentData);
     let socketsMap = new Map();
     let usersMap = new Map();
+    let gamesMap = new Map();
     sockets.set(tournamentId, socketsMap);
     userData.set(tournamentId, usersMap);
+    games.set(tournamentId, gamesMap);
     return server.json({ tournamentId: tournamentId }, 200);
   } catch (error) {
     console.log(error);

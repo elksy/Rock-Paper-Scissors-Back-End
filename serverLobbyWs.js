@@ -4,13 +4,15 @@ import {
   isWebSocketCloseEvent,
 } from "https://deno.land/std@0.99.0/ws/mod.ts";
 import generateRoundData from "./generateRoundData.js";
+import handleGamepageWs from "./serverGamepageWs.js";
 
 const handleWebSocket = async (
   server,
   sockets,
   userData,
   tournaments,
-  tournamentInfo
+  tournamentInfo,
+  games
 ) => {
   const { sessionId } = await server.cookies;
   const { tournamentId } = await server.params;
@@ -28,7 +30,8 @@ const handleWebSocket = async (
       sessionId,
       tournamentId,
       tournaments,
-      tournamentInfo
+      tournamentInfo,
+      games
     )
   );
 };
@@ -40,7 +43,8 @@ async function handleEvent(
   uuid,
   tournamentID,
   tournaments,
-  tournamentInfo
+  tournamentInfo,
+  games
 ) {
   await addUserSocket(ws, sockets, uuid, tournamentID);
   for await (const e of ws) {
@@ -62,7 +66,8 @@ async function handleEvent(
           tournamentID,
           userData,
           tournaments,
-          tournamentInfo
+          tournamentInfo,
+          games
         );
       }
     }
@@ -105,13 +110,24 @@ async function startGame(
   tournamentId,
   userData,
   tournaments,
-  tournamentInfo
+  tournamentInfo,
+  games
 ) {
   const info = tournamentInfo.get(tournamentId);
-  tournaments.set(
+  const tournamentData = generateRoundData(
+    userData,
     tournamentId,
-    generateRoundData(userData, tournamentId, info.addBots)
+    info.addBots
   );
+  tournaments.set(tournamentId, tournamentData);
+
+  for (let i = 0; i < tournamentData.length; i++) {
+    for (let j = 0; j < tournamentData[i].seeds.length; j++) {
+      let seedMap = new Map();
+      games.get(tournamentId).set(tournamentData[i].seeds[j].id, seedMap);
+    }
+  }
+
   const tournamentSockets = await sockets.get(tournamentId); // returns a Map of the sockets
   tournamentSockets.forEach((ws) => {
     ws.send(JSON.stringify({ message: "Start Game" }));
