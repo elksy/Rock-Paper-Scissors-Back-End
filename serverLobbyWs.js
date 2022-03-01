@@ -89,7 +89,12 @@ async function getPlayersList(userData, tournamentID) {
   const playersMap = await userData.get(tournamentID);
   const players = [];
   for (const [key, value] of playersMap) {
-    players.push({ name: value.name, uuid: key });
+    players.push({
+      name: value.name,
+      uuid: key,
+      bgColor: value.bgColor,
+      textColor: value.textColor,
+    });
   }
   return players;
 }
