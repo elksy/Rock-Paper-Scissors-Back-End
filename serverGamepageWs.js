@@ -47,6 +47,7 @@ async function handlePlayerMove(event, games, uuid, tournamentId, seedId) {
     const gameSockets = await games.get(tournamentId).get(seedId);
     for (let [key, value] of gameSockets.entries()) {
       if (key !== uuid) {
+        console.log({ player: event.player, choice: event.choice });
         value.send(
           JSON.stringify({
             move: { player: event.player, choice: event.choice },
