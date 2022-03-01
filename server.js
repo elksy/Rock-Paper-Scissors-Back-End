@@ -96,11 +96,12 @@ console.log(`server listening on http://localhost:${PORT}`);
 
 async function createTournament(server) {
   try {
-    const { rounds, timeLimit, addBots, type } = await server.body;
+    const { host, rounds, timeLimit, addBots, type } = await server.body;
     const tournamentId = v4.generate();
     console.log("tournamentID");
     console.log(tournamentId);
     const tournamentData = {
+      host: host,
       rounds: rounds,
       timeLimit: timeLimit,
       addBots: addBots,
