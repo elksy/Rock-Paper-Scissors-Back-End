@@ -138,13 +138,10 @@ function startNextRound(bracket, round) {
     return true;
   }
   for (let match of bracket[round + 1].seeds) {
-    console.log(match.teams);
     if (match.teams[0].name === "" || match.teams[1].name === "") {
-      console.log("false");
       return false;
     }
   }
-  console.log("true");
   return true;
 }
 

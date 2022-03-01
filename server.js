@@ -106,8 +106,10 @@ async function createTournament(server) {
     tournamentInfo.set(tournamentId, tournamentData);
     let socketsMap = new Map();
     let usersMap = new Map();
+    let gamesMap = new Map();
     sockets.set(tournamentId, socketsMap);
     userData.set(tournamentId, usersMap);
+    games.set(tournamentId, gamesMap);
     return server.json({ tournamentId: tournamentId }, 200);
   } catch (error) {
     console.log(error);
