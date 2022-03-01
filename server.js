@@ -10,11 +10,12 @@ import { v4 } from "https://deno.land/std/uuid/mod.ts";
 const DENO_ENV = (await Deno.env.get("DENO_ENV")) ?? "development";
 config({ path: `./.env.${DENO_ENV}`, export: true });
 const PORT = parseInt(Deno.env.get("PORT"));
+const ORIGIN = Deno.env.get("ORIGIN");
 
 // We need to set up a strict cors policy that works for http and websockets
 const CorsConfig = {
   methods: "GET",
-  origin: "http://localhost:3000",
+  origin: ORIGIN,
   allowedHeaders: [
     "Authorization",
     "Content-Type",
