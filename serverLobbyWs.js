@@ -69,9 +69,15 @@ async function handleEvent(
           tournamentInfo,
           games
         );
+      } else if ("makeLeave" in event) {
+        makePlayerLeave(sockets, tournamentID, event.makeLeave);
       }
     }
   }
+}
+async function makePlayerLeave(sockets, tournamentID, uuid) {
+  const playerWs = sockets.get(tournamentID).get(uuid);
+  playerWs.send(JSON.stringify({ message: "Leave Game" }));
 }
 
 async function addUserSocket(ws, sockets, uuid, tournamentID) {
@@ -91,6 +97,7 @@ async function updatePlayersList(sockets, userData, tournamentID) {
 }
 
 async function getPlayersList(userData, tournamentID) {
+  //should this really be called get?
   const playersMap = await userData.get(tournamentID);
   const players = [];
   for (const [key, value] of playersMap) {
