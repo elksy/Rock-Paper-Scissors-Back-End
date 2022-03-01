@@ -24,6 +24,7 @@ const CorsConfig = {
     "User-Agent",
   ],
   credentials: true,
+  exposedHeaders: ["set-cookie"],
 };
 
 const app = new Application();
