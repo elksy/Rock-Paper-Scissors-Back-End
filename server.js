@@ -15,7 +15,7 @@ const ORIGIN = Deno.env.get("ORIGIN");
 
 // We need to set up a strict cors policy that works for http and websockets
 const CorsConfig = {
-  methods: "GET",
+  methods: "GET,POST",
   origin: ORIGIN,
   allowedHeaders: [
     "Authorization",
