@@ -14,6 +14,7 @@ const handleWebSocket = async (
   tournamentInfo,
   games
 ) => {
+  console.log(server);
   console.log(server.cookies);
   const { sessionId } = await server.cookies;
   const { tournamentId } = await server.params;
