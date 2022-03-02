@@ -105,6 +105,7 @@ export async function updateTournamentBracket(
     }
   }
   const winnerInfo = await userData.get(tournamentID).get(result.winner);
+
   if (
     currentBracket[result.round].seeds[roundMatch].teams[0].name ===
     winnerInfo.name

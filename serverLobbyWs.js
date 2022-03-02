@@ -51,7 +51,6 @@ async function handleEvent(
     if (isWebSocketCloseEvent(e)) {
       //checks to see if browser closed
       await sockets.get(tournamentID).delete(uuid);
-      await userData.get(tournamentID).delete(uuid);
       updatePlayersList(sockets, userData, tournamentID);
       // Send out updated list
     } else {
