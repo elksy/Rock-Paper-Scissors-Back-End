@@ -159,22 +159,22 @@ async function createSession(server) {
     playerColour: playerColour,
     expiryDate: expiryDate,
   });
-  await server.setCookie({
-    name: "sessionId",
-    value: sessionId,
-    expires: expiryDate,
-    path: "/",
-  });
-  await server.setCookie({
-    name: "playerColour",
-    value: playerColour,
-    expires: expiryDate,
-    path: "/",
-  });
-  await server.setCookie({
-    name: "playerName",
-    value: playerName,
-    expires: expiryDate,
-    path: "/",
-  });
+  // await server.setCookie({
+  //   name: "sessionId",
+  //   value: sessionId,
+  //   expires: expiryDate,
+  //   path: "/",
+  // });
+  // await server.setCookie({
+  //   name: "playerColour",
+  //   value: playerColour,
+  //   expires: expiryDate,
+  //   path: "/",
+  // });
+  // await server.setCookie({
+  //   name: "playerName",
+  //   value: playerName,
+  //   expires: expiryDate,
+  //   path: "/",
+  // });
 }
