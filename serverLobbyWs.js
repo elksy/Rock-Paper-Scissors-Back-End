@@ -58,7 +58,7 @@ async function handleEvent(
     } else {
       const event = JSON.parse(e);
       if ("newPlayer" in event) {
-        if (sockets.get(tournamentID).size >= 3) {
+        if (sockets.get(tournamentID).size > 16) {
           ws.send(JSON.stringify({ message: "Game Full" }));
         } else {
           await addNewPlayerData(event, userData, uuid, tournamentID);
