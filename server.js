@@ -138,7 +138,14 @@ async function createSession(server) {
   const sessionId = v4.generate();
 
   const { playerName, playerColour } = await server.body;
-  const expiryDate = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
+  const expiryDate = new Date(new Date().getTime() + 1000 * 60 * 60 * 24);
+  server.json({
+    //sessionId: `sessionId=${sessionId}playerName=${playerName};playerColour=${playerColour}`,
+    sessionId: sessionId,
+    playerName: playerName,
+    playerColour: playerColour,
+    expiryDate: expiryDate,
+  });
   await server.setCookie({
     name: "sessionId",
     value: sessionId,
