@@ -4,6 +4,7 @@ import { config } from "https://deno.land/x/dotenv/mod.ts";
 import handleWebSocket from "./serverLobbyWs.js";
 import handleTournamentWS from "./serverTournamentWs.js";
 import handleGamepageWs from "./serverGamepageWs.js";
+import handleChatWs from "./serverChatWs.js";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
 // Fetches the environment variables to set up the correct PORT
@@ -70,6 +71,14 @@ let userData = new Map();
 //   }
 // }
 
+let chat = new Map();
+// tournamnetID: Map{
+//     uuid: socket,
+//     uuid: socket,
+//     uuid: socket,
+//   }
+// }
+
 app.use(abcCors(CorsConfig));
 // app.get("/session", (server) => getSession(server));
 app.get("/wslobby/:tournamentId", (server) =>
@@ -83,6 +92,8 @@ app.get("/wsgame/:tournamentId/:seedId", (server) =>
 app.get("/wsTournament/:tournamentId", (server) =>
   handleTournamentWS(server, sockets, tournaments, userData)
 );
+
+app.get("/wschat/:tournamentId", (server) => handleChatWs(server, chat));
 
 app.get("/getTournamentInfo/:id", (server) => getTournamentInfo(server));
 
@@ -112,9 +123,11 @@ async function createTournament(server) {
     let socketsMap = new Map();
     let usersMap = new Map();
     let gamesMap = new Map();
+    let chatMap = new Map();
     sockets.set(tournamentId, socketsMap);
     userData.set(tournamentId, usersMap);
     games.set(tournamentId, gamesMap);
+    chat.set(tournamentId, chatMap);
     return server.json({ tournamentId: tournamentId }, 200);
   } catch (error) {
     console.log(error);
