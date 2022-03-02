@@ -57,8 +57,12 @@ async function handleEvent(
     } else {
       const event = JSON.parse(e);
       if ("newPlayer" in event) {
-        await addNewPlayerData(event, userData, uuid, tournamentID);
-        await updatePlayersList(sockets, userData, tournamentID);
+        if (sockets.get(tournamentID).size >= 3) {
+          ws.send(JSON.stringify({ message: "Game Full" }));
+        } else {
+          await addNewPlayerData(event, userData, uuid, tournamentID);
+          await updatePlayersList(sockets, userData, tournamentID);
+        }
       } else if ("message" in event) {
         startGame(
           event,
@@ -77,7 +81,7 @@ async function handleEvent(
 }
 async function makePlayerLeave(sockets, tournamentID, uuid) {
   const playerWs = sockets.get(tournamentID).get(uuid);
-  playerWs.send(JSON.stringify({ message: "Leave Game" }));
+  playerWs.send(JSON.stringify({ message: "Kick Player" }));
 }
 
 async function addUserSocket(ws, sockets, uuid, tournamentID) {
