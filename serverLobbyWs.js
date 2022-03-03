@@ -50,12 +50,17 @@ async function handleEvent(
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
       await sockets.get(tournamentID).delete(uuid);
-      if (e.code === 1001 && uuid === tournamentInfo.get(tournamentID).host) {
+      if (uuid === tournamentInfo.get(tournamentID).host) {
         closeLobby(sockets, tournamentID);
-      }
-      if (e.code === 4000 || e.code === 1001) {
         await userData.get(tournamentID).delete(uuid);
-        updatePlayersList(sockets, userData, tournamentID);
+      } else if (e.code === 4000 || e.code === 1001) {
+        await userData.get(tournamentID).delete(uuid);
+        await updatePlayersList(sockets, userData, tournamentID);
+      }
+      if (sockets.get(tournamentID).size === 0) {
+        sockets.delete(tournamentID);
+        userData.delete(tournamentID);
+        tournamentInfo.delete(tournamentID);
       }
     } else {
       const event = JSON.parse(e);
@@ -94,6 +99,7 @@ async function closeLobby(sockets, tournamentID) {
   tournamentSockets.forEach((ws) => {
     ws.send(JSON.stringify({ message: "Close Lobby" }));
   });
+  // Need to remove tournament info
 }
 
 async function addUserSocket(ws, sockets, uuid, tournamentID) {
