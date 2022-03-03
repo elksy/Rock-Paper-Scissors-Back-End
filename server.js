@@ -46,11 +46,12 @@ let tournaments = new Map();
 // }
 
 let games = new Map();
-// {
+// {tournamentId :  seed id  : {
 //     uuid: socket,
 //     uuid: socket,
 //     uuid: socket,
 //   }
+// }
 
 let tournamentInfo = new Map();
 //  { tournamentId : {

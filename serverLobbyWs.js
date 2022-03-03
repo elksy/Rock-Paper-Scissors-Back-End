@@ -50,18 +50,19 @@ async function handleEvent(
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
       await sockets.get(tournamentID).delete(uuid);
-      if (uuid === tournamentInfo.get(tournamentID).host) {
+      if (e.code !== 3000 && uuid === tournamentInfo.get(tournamentID).host) {
         closeLobby(sockets, tournamentID);
         await userData.get(tournamentID).delete(uuid);
       } else if (e.code === 4000 || e.code === 1001) {
         await userData.get(tournamentID).delete(uuid);
         await updatePlayersList(sockets, userData, tournamentID);
       }
-      if (sockets.get(tournamentID).size === 0) {
+      if (userData.get(tournamentID).size === 0) {
         sockets.delete(tournamentID);
         userData.delete(tournamentID);
         tournamentInfo.delete(tournamentID);
       }
+      console.log(userData);
     } else {
       const event = JSON.parse(e);
       if ("newPlayer" in event) {
