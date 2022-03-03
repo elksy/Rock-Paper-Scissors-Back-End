@@ -7,8 +7,6 @@ import {
 const handleChatWs = async (server, chat) => {
   const { tournamentId } = await server.params;
   const uuid = await getUserUUID(server);
-  console.log(tournamentId);
-  console.log(uuid);
   const { conn, headers, r: bufReader, w: bufWriter } = server.request;
   const ws = await acceptWebSocket({
     conn,
@@ -19,9 +17,7 @@ const handleChatWs = async (server, chat) => {
 };
 
 async function handleEvent(ws, chat, tournamentId, uuid) {
-  console.log("Handle Event");
   await addUserSocket(ws, chat, uuid, tournamentId);
-  console.log(chat);
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
       await chat.get(tournamentId).delete(uuid);
