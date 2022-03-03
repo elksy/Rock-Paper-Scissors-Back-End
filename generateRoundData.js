@@ -51,10 +51,12 @@ function generateRoundData(
         players.push({
           name: "Bot" + players.length,
           bgColor: "Grey",
-          textColor: "White",
         });
       } else {
-        players.push(null);
+        players.push({
+          name: "BYE",
+          bgColor: "Grey",
+        });
       }
     }
   }
@@ -90,7 +92,7 @@ function generateRoundData(
 
   function resolveByes() {
     for (let i = 0; i < rounds[0].seeds.length; i++) {
-      if (rounds[0].seeds[i].teams[1] === null) {
+      if (rounds[0].seeds[i].teams[1].name === "BYE") {
         if (i % 2) {
           rounds[1].seeds[Math.floor(i / 2)].teams[1] =
             rounds[0].seeds[i].teams[0];
