@@ -24,7 +24,7 @@ async function handleEvent(ws, server, games, uuid, tournamentId, seedId) {
   addGamesWs(ws, games, tournamentId, seedId, uuid);
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
-      games.delete(uuid);
+      games.get(tournamentId).delete(uuid);
     } else {
       const event = JSON.parse(e);
       handlePlayerMove(event, games, uuid, tournamentId, seedId);
@@ -38,7 +38,6 @@ async function getUserUUID(server) {
 }
 
 async function addGamesWs(ws, games, tournamentId, seedId, uuid) {
-  console.log(games.get(tournamentId));
   await games.get(tournamentId).get(seedId).set(uuid, ws);
 }
 
@@ -47,7 +46,6 @@ async function handlePlayerMove(event, games, uuid, tournamentId, seedId) {
     const gameSockets = await games.get(tournamentId).get(seedId);
     for (let [key, value] of gameSockets.entries()) {
       if (key !== uuid) {
-        console.log({ player: event.player, choice: event.choice });
         value.send(
           JSON.stringify({
             move: { player: event.player, choice: event.choice },
