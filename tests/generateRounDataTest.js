@@ -128,11 +128,6 @@ Deno.test("Can choose to add bots or byes", () => {
   assertEquals(true, true);
 });
 
-// Deno.test(
-//   "If chosen to add bots, bots will be added if not enough players",
-//   () => {
-//     const botName = "Bot";
-//     const bracket = generateRoundData(userData, "fiveManTournament", true);
 
 //     assertEquals(bracket[0].seeds[1].teams[1].name.includes(botName), true);
 //     assertEquals(bracket[0].seeds[2].teams[1].name.includes(botName), true);
