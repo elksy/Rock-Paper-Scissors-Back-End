@@ -49,6 +49,7 @@ async function handleEvent(
   await addUserSocket(ws, sockets, uuid, tournamentID);
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
+      console.log(e);
       await sockets.get(tournamentID).delete(uuid);
       if (e.code !== 3000 && uuid === tournamentInfo.get(tournamentID).host) {
         closeLobby(sockets, tournamentID);
