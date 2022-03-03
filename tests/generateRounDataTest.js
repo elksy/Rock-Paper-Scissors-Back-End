@@ -129,11 +129,6 @@ Deno.test("Can choose to add bots or byes", () => {
 });
 
 
-//     assertEquals(bracket[0].seeds[1].teams[1].name.includes(botName), true);
-//     assertEquals(bracket[0].seeds[2].teams[1].name.includes(botName), true);
-//     assertEquals(bracket[0].seeds[3].teams[1].name.includes(botName), true);
-//   }
-// );
 
 Deno.test(
   "If chosen to have byes, empty spaces will be filled, and players without opponents will move on to the next round in the right position",
