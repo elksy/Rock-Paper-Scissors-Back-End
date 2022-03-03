@@ -14,8 +14,6 @@ const handleWebSocket = async (
   tournamentInfo,
   games
 ) => {
-  console.log(server);
-  console.log(server.cookies);
   const { sessionId } = await server.cookies;
   const { tournamentId } = await server.params;
   const { conn, headers, r: bufReader, w: bufWriter } = server.request;
@@ -51,10 +49,10 @@ async function handleEvent(
   await addUserSocket(ws, sockets, uuid, tournamentID);
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
-      //checks to see if browser closed
+      console.log("Client closed");
       await sockets.get(tournamentID).delete(uuid);
+      await userData.get(tournamentID).delete(uuid);
       updatePlayersList(sockets, userData, tournamentID);
-      // Send out updated list
     } else {
       const event = JSON.parse(e);
       if ("newPlayer" in event) {
@@ -64,7 +62,7 @@ async function handleEvent(
           await addNewPlayerData(event, userData, uuid, tournamentID);
           await updatePlayersList(sockets, userData, tournamentID);
         }
-      } else if ("message" in event) {
+      } else if ("message" in event && event.message === "Start Game") {
         startGame(
           event,
           sockets,
@@ -76,6 +74,8 @@ async function handleEvent(
         );
       } else if ("makeLeave" in event) {
         makePlayerLeave(sockets, tournamentID, event.makeLeave);
+      } else if ("message" in event && event.message === "Close Lobby") {
+        closeLobby(sockets, tournamentID);
       }
     }
   }
@@ -83,6 +83,13 @@ async function handleEvent(
 async function makePlayerLeave(sockets, tournamentID, uuid) {
   const playerWs = sockets.get(tournamentID).get(uuid);
   playerWs.send(JSON.stringify({ message: "Kick Player" }));
+}
+
+async function closeLobby(sockets, tournamentID) {
+  const tournamentSockets = await sockets.get(tournamentID); // returns a Map of the sockets
+  tournamentSockets.forEach((ws) => {
+    ws.send(JSON.stringify({ message: "Close Lobby" }));
+  });
 }
 
 async function addUserSocket(ws, sockets, uuid, tournamentID) {
