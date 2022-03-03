@@ -3,6 +3,7 @@
 function generateRoundData(
   userData,
   tournamentID,
+  numOfGames,
   includeBots = false,
   shuffleSeed = 0
 ) {
@@ -56,6 +57,7 @@ function generateRoundData(
         players.push({
           name: "BYE",
           bgColor: "Grey",
+          uuid: "2255",
         });
       }
     }
@@ -94,6 +96,7 @@ function generateRoundData(
     for (let i = 0; i < rounds[0].seeds.length; i++) {
       if (rounds[0].seeds[i].teams[1].name === "BYE") {
         if (i % 2) {
+          rounds[0].seeds[i].score = [Math.ceil(numOfGames / 2), 0];
           rounds[1].seeds[Math.floor(i / 2)].teams[1] =
             rounds[0].seeds[i].teams[0];
         } else {
