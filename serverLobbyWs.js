@@ -129,6 +129,7 @@ async function startGame(
   const tournamentData = generateRoundData(
     userData,
     tournamentId,
+    info.rounds,
     info.addBots
   );
   tournaments.set(tournamentId, tournamentData);
