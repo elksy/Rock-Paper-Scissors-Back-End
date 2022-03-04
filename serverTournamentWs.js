@@ -47,6 +47,7 @@ async function handleEvent(
   sendTournamentBracket(ws, tournaments.get(tournamentID));
   setTimeout(() => sendInitialStart(ws), 5000);
   for await (const e of ws) {
+    console.log(userData);
     if (isWebSocketCloseEvent(e)) {
       console.log("closing tournament ws");
       await sockets.get(tournamentID).delete(uuid);
