@@ -1,4 +1,4 @@
-# Rock-Paper-Scissors-Back-End
+# Rock, Paper, Scissors Tournament Back End
 
 ![enter image description here](https://img.shields.io/badge/RPS-Tournament-orange) ![enter image description here](https://img.shields.io/github/stars/elksy/Rock-Paper-Scissors-Back-End)  ![enter image description here](https://img.shields.io/badge/cors-v1.2.2-green)  ![enter image description here](https://img.shields.io/badge/dotenv-v3.2.0-green)  ![enter image description here](https://img.shields.io/badge/std-0.128.0-green) ![enter image description here](https://img.shields.io/badge/abc-v1.3.3-green)
 
