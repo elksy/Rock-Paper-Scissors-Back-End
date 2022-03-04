@@ -143,3 +143,10 @@ let chat = new Map();
 // }
 ```
 
+## Developers
+The developers that worked on this project are: 
+
+ - Project Manager & Engineer: Mariam Raashid  
+ - Architect, Development Operations & Engineer: Rob Elkes  
+ - Quality Assurance & Engineer: Kishor Shris  
+ - Quality Assurance & Engineer: Harry Davis
