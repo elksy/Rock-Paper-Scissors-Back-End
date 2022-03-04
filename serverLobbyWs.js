@@ -1,10 +1,8 @@
 import {
   acceptWebSocket,
-  acceptable,
   isWebSocketCloseEvent,
 } from "https://deno.land/std@0.99.0/ws/mod.ts";
 import generateRoundData from "./generateRoundData.js";
-import handleGamepageWs from "./serverGamepageWs.js";
 
 const handleWebSocket = async (
   server,
@@ -118,7 +116,6 @@ async function updatePlayersList(sockets, userData, tournamentID) {
 }
 
 async function getPlayersList(userData, tournamentID) {
-  //should this really be called get?
   const playersMap = await userData.get(tournamentID);
   const players = [];
   for (const [key, value] of playersMap) {

@@ -1,11 +1,9 @@
 import {
   acceptWebSocket,
-  acceptable,
   isWebSocketCloseEvent,
 } from "https://deno.land/std@0.99.0/ws/mod.ts";
 
-//send opp choice
-
+// Recieves a player choice and sends it to the correct sockets.
 const handleGamepageWs = async (server, games) => {
   const uuid = await getUserUUID(server);
   let { tournamentId, seedId } = await server.params;
@@ -24,7 +22,6 @@ async function handleEvent(ws, server, games, uuid, tournamentId, seedId) {
   addGamesWs(ws, games, tournamentId, seedId, uuid);
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
-      games.get(tournamentId).delete(uuid);
     } else {
       const event = JSON.parse(e);
       handlePlayerMove(event, games, uuid, tournamentId, seedId);
