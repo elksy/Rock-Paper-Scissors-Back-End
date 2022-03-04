@@ -13,3 +13,90 @@
 This backend needs to be used in conjunction with the [RPS frontend](https://github.com/elksy/Rock-Paper-Scissors-Front-End)
 
     deno run --allow-net --allow-env server.js
+
+## Tournament data structure
+
+The tournament bracket that stores the position and score of all players is structured in the format of react-bracket so that it can be displayed properly using that library
+
+![Tournament Bracket](./assets/tournamentBracket.png)
+
+Websockets are stored in a map that contains all the tournament IDs that are assigned to another map containing all the user websockets defined by their UUID.
+
+```
+let sockets = new Map();
+// {
+//    tournamentID: Map {
+//      uuid: socket,
+//      uuid: socket,
+//      uuid: socket
+//   }
+// }
+```
+
+Tournament brackets are stored in a map with the tournament id as the key.
+
+```
+let tournaments = new Map();
+// {
+//    tournamentID: [tournament bracket data],
+//    tournamentID: [tournament bracket data]
+// }
+```
+
+Games bracket is a map that stores all the tournament IDs that are assigned to another map that stores players in each match using the bracket seed as the key.
+
+```
+let games = new Map();
+// {
+//    tournamentId :  
+//    seed id: Map {
+//       uuid: socket,
+//       uuid: socket
+//   }
+// }
+```
+
+
+The tournament information is stored as a map with all the configurations for a tournament with the tournament ID as the key.
+
+```
+let tournamentInfo = new Map();
+//  { 
+//    tournamentId : {
+//       rounds: rounds,
+//       timeLimit: timeLimit,
+//       type: type
+//     }
+// }
+```
+
+
+The user’s data is stored in a map that contains all the tournament IDs assigned to another map that contains all the user’s information required to make decisions and display them on the bracket.
+
+```
+let userData = new Map();
+// {
+//   tournamentID: Map {
+//     uuid: {
+//       name: 'rob',
+//       bgColour: 'green',
+//       textColor: 'black,'
+//       uuid: uuid
+//     }
+//   }
+// }
+```
+
+A map is made for the chat that contains all the tournaments, which is assigned to another map that stores all the sockets for players in that tournament to send and receive chat messages.
+
+```
+let chat = new Map();
+// {
+//   tournamentID: Map {
+//     uuid: socket,
+//     uuid: socket,
+//     uuid: socket,
+//   }
+// }
+```
+
