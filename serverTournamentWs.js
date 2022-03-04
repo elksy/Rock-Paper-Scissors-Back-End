@@ -4,7 +4,14 @@ import {
   isWebSocketCloseEvent,
 } from "https://deno.land/std@0.99.0/ws/mod.ts";
 
-const handleTournamentWS = async (server, sockets, tournaments, userData) => {
+const handleTournamentWS = async (
+  server,
+  sockets,
+  tournaments,
+  userData,
+  tournamentInfo,
+  games
+) => {
   const uuid = getUserUUID(server);
   const { tournamentId } = await server.params;
   const { conn, headers, r: bufReader, w: bufWriter } = server.request;
@@ -14,7 +21,16 @@ const handleTournamentWS = async (server, sockets, tournaments, userData) => {
     bufReader,
     bufWriter,
   }).then((ws) =>
-    handleEvent(ws, sockets, tournaments, uuid, tournamentId, userData)
+    handleEvent(
+      ws,
+      sockets,
+      tournaments,
+      uuid,
+      tournamentId,
+      userData,
+      tournamentInfo,
+      games
+    )
   );
 };
 
@@ -24,7 +40,9 @@ async function handleEvent(
   tournaments,
   uuid,
   tournamentID,
-  userData
+  userData,
+  tournamentInfo,
+  games
 ) {
   addUserSocket(ws, sockets, uuid, tournamentID);
   sendTournamentBracket(ws, tournaments.get(tournamentID));
@@ -32,8 +50,14 @@ async function handleEvent(
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
       sockets.get(tournamentID).delete(uuid);
-      // Need to also update the bracket and maybe replace player with a bot.
-      // Right now a close event should only happen once the tournament is finished and we re-direct players to the winners-page
+      userData.get(tournamentID).delete(uuid);
+      if (sockets.get(tournamentID).size === 0) {
+        sockets.delete(tournamentID);
+        userData.delete(tournamentID);
+        tournaments.delete(tournamentID);
+        games.delete(tournamentID);
+        tournamentInfo.delete(tournamentID);
+      }
     } else {
       const event = JSON.parse(e);
       updateBracket(event, sockets, tournaments, tournamentID, userData);
