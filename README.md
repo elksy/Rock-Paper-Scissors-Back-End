@@ -8,6 +8,14 @@
 
  
  - [Installation](#installation)
+   - [Installation](#installation)
+ - [Tournament data structure](#tournament-data-structure)
+   - [Sockets Map](#sockets-map)
+   - [Tournaments Map](#tournaments-map)
+   - [Games Map](#games-map)
+   - [Tournament Info Map](#tournament-info-map)
+   - [User Data Map](#user-data-map)
+   - [Chat Map](#chat-map)
 
 ## Installation
 This backend needs to be used in conjunction with the [RPS frontend](https://github.com/elksy/Rock-Paper-Scissors-Front-End)
@@ -20,6 +28,8 @@ The tournament bracket that stores the position and score of all players is stru
 
 ![Tournament Bracket](./assets/tournamentBracket.png)
 
+
+### Sockets Map
 Websockets are stored in a map that contains all the tournament IDs that are assigned to another map containing all the user websockets defined by their UUID.
 
 ```
@@ -33,6 +43,8 @@ let sockets = new Map();
 // }
 ```
 
+
+### Tournaments Map
 Tournament brackets are stored in a map with the tournament id as the key.
 
 ```
@@ -43,6 +55,8 @@ let tournaments = new Map();
 // }
 ```
 
+
+### Games Map
 Games bracket is a map that stores all the tournament IDs that are assigned to another map that stores players in each match using the bracket seed as the key.
 
 ```
@@ -57,6 +71,7 @@ let games = new Map();
 ```
 
 
+### Tournament Info Map
 The tournament information is stored as a map with all the configurations for a tournament with the tournament ID as the key.
 
 ```
@@ -70,7 +85,7 @@ let tournamentInfo = new Map();
 // }
 ```
 
-
+### User Data Map
 The user’s data is stored in a map that contains all the tournament IDs assigned to another map that contains all the user’s information required to make decisions and display them on the bracket.
 
 ```
@@ -87,6 +102,7 @@ let userData = new Map();
 // }
 ```
 
+### Chat Map
 A map is made for the chat that contains all the tournaments, which is assigned to another map that stores all the sockets for players in that tournament to send and receive chat messages.
 
 ```
