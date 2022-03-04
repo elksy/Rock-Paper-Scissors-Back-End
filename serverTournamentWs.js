@@ -48,9 +48,11 @@ async function handleEvent(
   setTimeout(() => sendInitialStart(ws), 5000);
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
+      console.log("closing tournament ws");
       await sockets.get(tournamentID).delete(uuid);
       await userData.get(tournamentID).delete(uuid);
       if (userData.get(tournamentID).size === 0) {
+        console.log("userData is empty");
         sockets.delete(tournamentID);
         userData.delete(tournamentID);
         tournaments.delete(tournamentID);

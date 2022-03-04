@@ -22,6 +22,7 @@ async function handleEvent(ws, server, games, uuid, tournamentId, seedId) {
   addGamesWs(ws, games, tournamentId, seedId, uuid);
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
+      console.log("closing game ws");
     } else {
       const event = JSON.parse(e);
       handlePlayerMove(event, games, uuid, tournamentId, seedId);
