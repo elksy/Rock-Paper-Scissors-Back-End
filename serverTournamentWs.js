@@ -48,9 +48,9 @@ async function handleEvent(
   setTimeout(() => sendInitialStart(ws), 5000);
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
-      sockets.get(tournamentID).delete(uuid);
-      userData.get(tournamentID).delete(uuid);
-      if (sockets.get(tournamentID).size === 0) {
+      await sockets.get(tournamentID).delete(uuid);
+      await userData.get(tournamentID).delete(uuid);
+      if (userData.get(tournamentID).size === 0) {
         sockets.delete(tournamentID);
         userData.delete(tournamentID);
         tournaments.delete(tournamentID);
