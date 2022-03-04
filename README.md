@@ -17,6 +17,7 @@
    - [Tournament Info Map](#tournament-info-map)
    - [User Data Map](#user-data-map)
    - [Chat Map](#chat-map)
+ - [Developers](#developers)
 
 ## Usage
 This backend needs to be used in conjunction with the [RPS frontend](https://github.com/elksy/Rock-Paper-Scissors-Front-End)
