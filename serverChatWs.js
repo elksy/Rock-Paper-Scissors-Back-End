@@ -21,6 +21,9 @@ async function handleEvent(ws, chat, tournamentId, uuid) {
   for await (const e of ws) {
     if (isWebSocketCloseEvent(e)) {
       await chat.get(tournamentId).delete(uuid);
+      if (chat.get(tournamentId).size === 0) {
+        chat.delete(tournamentId);
+      }
     } else {
       const event = JSON.parse(e);
       if ("name" in event && "message" in event) {

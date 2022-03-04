@@ -91,7 +91,14 @@ app.get("/wsgame/:tournamentId/:seedId", (server) =>
 );
 
 app.get("/wsTournament/:tournamentId", (server) =>
-  handleTournamentWS(server, sockets, tournaments, userData)
+  handleTournamentWS(
+    server,
+    sockets,
+    tournaments,
+    userData,
+    tournamentInfo,
+    games
+  )
 );
 
 app.get("/wschat/:tournamentId", (server) => handleChatWs(server, chat));
