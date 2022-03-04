@@ -50,12 +50,15 @@ async function handleEvent(
       await sockets.get(tournamentID).delete(uuid);
       if (e.code !== 3000 && uuid === tournamentInfo.get(tournamentID).host) {
         closeLobby(sockets, tournamentID);
+        console.log("lobby code host");
         await userData.get(tournamentID).delete(uuid);
       } else if (e.code === 4000 || e.code === 1001) {
+        console.log("lobby code 4000");
         await userData.get(tournamentID).delete(uuid);
         await updatePlayersList(sockets, userData, tournamentID);
       }
       if (userData.get(tournamentID).size === 0) {
+        console.log("lobby map empty");
         sockets.delete(tournamentID);
         userData.delete(tournamentID);
         tournamentInfo.delete(tournamentID);
