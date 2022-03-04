@@ -7,8 +7,9 @@
 # Table of contents
 
  
- - [Installation](#installation)
-   - [Installation](#installation)
+ - [Usage](#usage)
+   - [Locally](#locally)
+   - [Deployed](#deployed)
  - [Tournament data structure](#tournament-data-structure)
    - [Sockets Map](#sockets-map)
    - [Tournaments Map](#tournaments-map)
@@ -17,10 +18,36 @@
    - [User Data Map](#user-data-map)
    - [Chat Map](#chat-map)
 
-## Installation
+## Usage
 This backend needs to be used in conjunction with the [RPS frontend](https://github.com/elksy/Rock-Paper-Scissors-Front-End)
 
-    deno run --allow-net --allow-env server.js
+
+We have development and production environment files that will determine what port the server is run on and what origin the CORS will listen to
+
+### Locally
+To run the server you will need to enter this command on the terminal:
+
+```
+deno run --allow-net --allow-read --allow-env --unstable server.js
+```
+
+By default the server will run on the development environment file due to this line in the server.
+
+```
+const DENO_ENV = (await Deno.env.get("DENO_ENV")) ?? "development";
+
+```
+Which runs the server on port 8080 and listens to the origin localhost:3000
+
+### Deployed
+
+To run the server deployed you will need to enter this command on the terminal:
+
+```
+DENO_ENV=production deno run --allow-net --allow-read --allow-env --unstable server.js
+```
+This will choose the environment file that the server will use, which will run the environment file on port 80 and listen to the origin [rock-paper-scissors-tournament.netlify.app](https://rock-paper-scissors-tournament.netlify.app/), our frontend website.
+
 
 ## Tournament data structure
 
