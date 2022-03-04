@@ -117,8 +117,6 @@ async function createTournament(server) {
   try {
     const { host, rounds, timeLimit, addBots, type } = await server.body;
     const tournamentId = v4.generate();
-    console.log("tournamentID");
-    console.log(tournamentId);
     const tournamentData = {
       host: host,
       rounds: rounds,
@@ -161,28 +159,9 @@ async function createSession(server) {
   const { playerName, playerColour } = await server.body;
   const expiryDate = new Date(new Date().getTime() + 1000 * 60 * 60 * 24);
   server.json({
-    //sessionId: `sessionId=${sessionId}playerName=${playerName};playerColour=${playerColour}`,
     sessionId: sessionId,
     playerName: playerName,
     playerColour: playerColour,
     expiryDate: expiryDate,
-  });
-  await server.setCookie({
-    name: "sessionId",
-    value: sessionId,
-    expires: expiryDate,
-    path: "/",
-  });
-  await server.setCookie({
-    name: "playerColour",
-    value: playerColour,
-    expires: expiryDate,
-    path: "/",
-  });
-  await server.setCookie({
-    name: "playerName",
-    value: playerName,
-    expires: expiryDate,
-    path: "/",
   });
 }

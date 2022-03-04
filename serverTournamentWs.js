@@ -1,6 +1,5 @@
 import {
   acceptWebSocket,
-  acceptable,
   isWebSocketCloseEvent,
 } from "https://deno.land/std@0.99.0/ws/mod.ts";
 
@@ -96,7 +95,7 @@ async function updateBracket(
     const newBracket = await updateTournamentBracket(
       tournaments,
       tournamentID,
-      result, // winner round { winner: uuid, round: index, roundMatch: index, score: [score,score]}
+      result, // result ={ winner: uuid, round: index, roundMatch: index, score: [score,score]}
       userData
     );
     const tournamentSockets = await sockets.get(tournamentID);
@@ -151,13 +150,10 @@ export async function updateTournamentBracket(
     ] = await userData.get(tournamentID).get(result.winner);
   }
 
-  if (result.round === currentBracket.length - 1) {
-    // endTournament() placeholder func
-  }
   return currentBracket;
 }
 
-// Return true or false if
+// Return true or false if the next round should start
 function startNextRound(bracket, round) {
   if (round === bracket.length - 1) {
     return true;
