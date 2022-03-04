@@ -100,6 +100,7 @@ function generateRoundData(
           rounds[1].seeds[Math.floor(i / 2)].teams[1] =
             rounds[0].seeds[i].teams[0];
         } else {
+          rounds[0].seeds[i].score = [Math.ceil(numOfGames / 2), 0];
           rounds[1].seeds[Math.floor(i / 2)].teams[0] =
             rounds[0].seeds[i].teams[0];
         }
